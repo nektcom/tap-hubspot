@@ -47,6 +47,20 @@ class TapHubspot(Tap):
             th.DateTimeType,
             description="Latest record date to sync",
         ),
+        th.Property(
+            "extract_deal_associations",
+            th.BooleanType,
+            default=False,
+            required=True,
+            description="Enable the extraction of entities associated with deals",
+        ),
+        th.Property(
+            "extract_deal_associations_comma_separated_string",
+            th.StringType,
+            required=False,
+            default="calls, commerce_payments, communications, companies, contacts, deal_split, deals, emails, invoices, line_item, meetings, notes, orders, postal_mail, quotes, services, subscriptions, tasks, tickets",
+            description="Comma separated string with the name of entities that should be extracted",
+        ),
     ).to_dict()
 
     def discover_streams(self) -> list[streams.HubspotStream]:
@@ -55,6 +69,8 @@ class TapHubspot(Tap):
         Returns:
             A list of discovered streams.
         """
+        return [streams.DealStream(self)]
+
         return [
             streams.ContactStream(self),
             streams.UsersStream(self),
