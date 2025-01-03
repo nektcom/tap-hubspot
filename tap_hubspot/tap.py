@@ -69,8 +69,6 @@ class TapHubspot(Tap):
         Returns:
             A list of discovered streams.
         """
-        return [streams.DealStream(self)]
-
         return [
             streams.ContactStream(self),
             streams.UsersStream(self),
