@@ -4,20 +4,15 @@ from __future__ import annotations
 
 import datetime
 import sys
-from typing import Any, Callable, Iterable
+from functools import cached_property
+from typing import Any, Callable
 
 import requests
+from custom_logger import user_logger
 from singer_sdk import typing as th
-from singer_sdk._singerlib.utils import strptime_to_utc
+from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.pagination import BaseAPIPaginator
 from singer_sdk.streams import RESTStream
-
-if sys.version_info >= (3, 8):
-    from functools import cached_property
-else:
-    from cached_property import cached_property
-
-from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.streams.core import REPLICATION_INCREMENTAL
 from tap_hubspot.auth import HubSpotOAuthAuthenticator
 
@@ -322,8 +317,8 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
                 # Hubspot wont return more than 10k records so when we hit 10k we
                 # need to reset our epoch to most recent and not send the next_page_token
                 if int(next_page_token) + 100 >= 10000:
-                    self.logger.warning(
-                        f"More than 10k objects in the search result. Updating record_id filter to {self.last_record_id} and date filter to {self.date_filter.isoformat()}."
+                    user_logger.warning(
+                        f'More than 10k objects in the search result. Updating record_id filter to "{self.last_record_id}" and date filter to "{self.date_filter.isoformat()}".'
                     )
                     self.record_id_filter = {
                         "propertyName": "hs_object_id",

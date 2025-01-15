@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import custom_logger
+
+_ = custom_logger
 from singer_sdk import Tap
-from singer_sdk import typing as th  # JSON schema typing helpers
+from singer_sdk import typing as th
 from tap_hubspot import streams
 
 
@@ -96,4 +99,5 @@ class TapHubspot(Tap):
 
 
 if __name__ == "__main__":
+    TapHubspot.cli()
     TapHubspot.cli()
