@@ -22,7 +22,6 @@ requests = "^2.28.2"
 singer-sdk = { version="^0.33.1" }
 
 custom-logger = {git = "https://github.com/olbycom/nekt-custom-logger-module.git", rev = "v0.0.6"}
-record-cleanser = {git = "https://github.com/olbycom/nekt-record-cleanser.git", rev = "v0.6.2"}
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.1"
 singer-sdk = { version="^0.33.1", extras = ["testing"] }

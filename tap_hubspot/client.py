@@ -15,7 +15,6 @@ from singer_sdk.pagination import BaseAPIPaginator
 from singer_sdk.streams import RESTStream
 from singer_sdk.streams.core import REPLICATION_INCREMENTAL
 from tap_hubspot.auth import HubSpotOAuthAuthenticator
-from record_cleanser import RecordCleanser
 
 if sys.version_info < (3, 11):
     from backports.datetime_fromisoformat import MonkeyPatch
@@ -36,7 +35,6 @@ class HubspotStream(RESTStream):
         return "https://api.hubapi.com/"
 
     records_jsonpath = "$[*]"  # Or override `parse_response`.
-    record_cleanser = RecordCleanser()
 
     # Set this value or override `get_new_paginator`.
     next_page_token_jsonpath = "$.next_page"

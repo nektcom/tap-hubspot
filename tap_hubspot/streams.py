@@ -165,7 +165,7 @@ class TicketPipelineStream(HubspotStream):
                     ),
                     Property("stageId", StringType),
                     Property("createdAt", IntegerType),
-                    Property("updatedAt", StringType),
+                    Property("updatedAt", IntegerType),
                     Property("active", BooleanType),
                 ),
             ),
@@ -174,7 +174,7 @@ class TicketPipelineStream(HubspotStream):
         Property("objectTypeId", StringType),
         Property("pipelineId", StringType),
         Property("createdAt", IntegerType),
-        Property("updatedAt", StringType),
+        Property("updatedAt", IntegerType),
         Property("default", BooleanType),
     ).to_dict()
 
