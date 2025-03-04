@@ -46,6 +46,64 @@ class ContactStream(DynamicIncrementalHubspotStream):
     replication_method = "INCREMENTAL"
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
+    @cached_property
+    def associations_string_list(self) -> list[str]:
+        return (
+            self.config.get("extract_contact_associations_comma_separated_string")
+            .replace(" ", "")
+            .split(",")
+        )
+
+    @cached_property
+    def should_extract_associations(self) -> bool:
+        return (
+            self.config.get("extract_contact_associations")
+            and self.associations_string_list
+        )
+
+    @cached_property
+    def schema(self) -> dict:
+        schema = super().schema
+        if not self.should_extract_associations:
+            return schema
+
+        associations_schema = th.PropertiesList()
+        for association_string in self.associations_string_list:
+            associations_schema.append(
+                th.Property(
+                    association_string,
+                    th.ArrayType(
+                        th.ObjectType(
+                            th.Property("id", th.StringType),
+                            th.Property("type", th.StringType),
+                        )
+                    ),
+                )
+            )
+
+        schema["properties"]["associations"] = associations_schema.to_dict()
+        return schema
+
+    def post_process(self, row, context=None):
+        if not self.should_extract_associations:
+            return super().post_process(row, context)
+
+        details_url = f"{self.url_base}/objects/contacts/{row['id']}"
+        params = {"associations": self.associations_string_list}
+        headers = {"Authorization": f"Bearer {self.config.get('access_token')}"}
+        response = requests.get(details_url, params=params, headers=headers)
+
+        if not response.status_code == HTTPStatus.OK:
+            row["associations"] = {}
+            return super().post_process(row, context)
+
+        associations_data = response.json().get("associations", {})
+        row["associations"] = {
+            k: v.get("results") for k, v in associations_data.items()
+        }
+
+        return super().post_process(row, context)
+
     @property
     def url_base(self) -> str:
         """
@@ -1168,11 +1226,15 @@ class PropertyNotesStream(HubspotStream):
         property_product = PropertyProductStream(self._tap, schema={"properties": {}})
         property_lineitem = PropertyLineItemStream(self._tap, schema={"properties": {}})
         property_email = PropertyEmailStream(self._tap, schema={"properties": {}})
-        property_postalmail = PropertyPostalMailStream(self._tap, schema={"properties": {}})
+        property_postalmail = PropertyPostalMailStream(
+            self._tap, schema={"properties": {}}
+        )
         property_call = PropertyCallStream(self._tap, schema={"properties": {}})
         property_meeting = PropertyMeetingStream(self._tap, schema={"properties": {}})
         property_task = PropertyTaskStream(self._tap, schema={"properties": {}})
-        property_communication = PropertyCommunicationStream(self._tap, schema={"properties": {}})
+        property_communication = PropertyCommunicationStream(
+            self._tap, schema={"properties": {}}
+        )
         property_records = (
             list(property_ticket.get_records(context))
             + list(property_deal.get_records(context))
@@ -1246,11 +1308,18 @@ class DealStream(DynamicIncrementalHubspotStream):
 
     @cached_property
     def associations_string_list(self) -> list[str]:
-        return self.config.get("extract_deal_associations_comma_separated_string").replace(" ", "").split(",")
+        return (
+            self.config.get("extract_deal_associations_comma_separated_string")
+            .replace(" ", "")
+            .split(",")
+        )
 
     @cached_property
     def should_extract_associations(self) -> bool:
-        return self.config.get("extract_deal_associations") and self.associations_string_list
+        return (
+            self.config.get("extract_deal_associations")
+            and self.associations_string_list
+        )
 
     @cached_property
     def schema(self) -> dict:
@@ -1296,7 +1365,9 @@ class DealStream(DynamicIncrementalHubspotStream):
             return super().post_process(row, context)
 
         associations_data = response.json().get("associations", {})
-        row["associations"] = {k: v.get("results") for k, v in associations_data.items()}
+        row["associations"] = {
+            k: v.get("results") for k, v in associations_data.items()
+        }
 
         return super().post_process(row, context)
 

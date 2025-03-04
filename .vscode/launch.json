@@ -11,7 +11,9 @@
         "--config",
         ".secrets/config.json",
         "--state",
-        ".secrets/state.json"
+        ".secrets/state.json",
+        ">",
+        "output/output.jsonl",
       ],
       "env": { "PYTHONPATH": "${workspaceRoot}" },
       // Change this to false if you wish to debug and add breakpoints outside of your code e.g. the singer-sdk package
@@ -23,7 +25,7 @@
       "request": "launch",
       "program": "${workspaceRoot}/tap_hubspot/tap.py",
       "console": "integratedTerminal",
-      "args": ["--config", ".secrets/config.json"],
+      "args": ["--config", ".secrets/config.json", ">", "output/output.jsonl"],
       "env": { "PYTHONPATH": "${workspaceRoot}" },
       // Change this to false if you wish to debug and add breakpoints outside of your code e.g. the singer-sdk package
       "justMyCode": false
