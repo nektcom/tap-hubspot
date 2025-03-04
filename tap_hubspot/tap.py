@@ -88,9 +88,6 @@ class TapHubspot(Tap):
         """
         return [
             streams.ContactStream(self),
-        ]
-        return [
-            streams.ContactStream(self),
             streams.UsersStream(self),
             streams.OwnersStream(self),
             streams.TicketPipelineStream(self),
