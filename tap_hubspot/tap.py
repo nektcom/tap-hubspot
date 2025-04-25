@@ -23,22 +23,14 @@ class TapHubspot(Tap):
             description="Token to authenticate against the API service",
         ),
         th.Property(
-            "client_id",
-            th.StringType,
+            "oauth_credentials",
+            th.ObjectType(
+                th.Property("client_id", th.StringType),
+                th.Property("client_secret", th.StringType),
+                th.Property("refresh_token", th.StringType),
+            ),
             required=False,
-            description="The OAuth app client ID.",
-        ),
-        th.Property(
-            "client_secret",
-            th.StringType,
-            required=False,
-            description="The OAuth app client secret.",
-        ),
-        th.Property(
-            "refresh_token",
-            th.StringType,
-            required=False,
-            description="The OAuth app refresh token.",
+            description="The OAuth credentials needed to authenticate against the API service.",
         ),
         th.Property(
             "start_date",

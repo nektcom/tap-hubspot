@@ -47,7 +47,7 @@ class HubspotStream(RESTStream):
             An authenticator instance.
         """
 
-        if "refresh_token" in self.config:
+        if "refresh_token" in self.config.get("oauth_credentials", {}):
             return HubSpotOAuthAuthenticator(
                 self,
                 auth_endpoint="https://api.hubapi.com/oauth/v1/token",
