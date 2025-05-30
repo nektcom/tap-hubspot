@@ -21,7 +21,7 @@ fs-s3fs = { version = "^1.1.1", optional = true }
 requests = "^2.28.2"
 singer-sdk = { version="^0.33.1" }
 
-custom-logger = {git = "https://github.com/olbycom/nekt-custom-logger-module.git", rev = "v0.0.6"}
+custom-logger = {git = "https://github.com/nektcom/nekt-custom-logger-module.git", rev = "v0.0.6"}
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.1"
 singer-sdk = { version="^0.33.1", extras = ["testing"] }
