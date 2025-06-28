@@ -83,7 +83,7 @@ class TapHubspot(Tap):
 
         custom_objects = self.get_custom_objects()
         for custom_object in custom_objects:
-            user_logger.info(f"Discovered custom object: {custom_object['object_name']}")
+            self.user_discovery_logger.info(f"Discovered custom object: {custom_object['object_name']}")
             streams_list.append(
                 streams.CustomObjectStream(
                     tap=self,
@@ -132,7 +132,7 @@ class TapHubspot(Tap):
             response = requests.get(endpoint, headers=headers)
             response.raise_for_status()
             custom_objects = response.json()["results"]
-            user_logger.info(f"Found {len(custom_objects)} custom objects")
+            self.user_discovery_logger.info(f"Found {len(custom_objects)} custom objects")
             return [
                 {
                     "object_name": custom_object["name"],
@@ -142,7 +142,7 @@ class TapHubspot(Tap):
                 for custom_object in custom_objects
             ]
         except Exception as e:
-            user_logger.warning(f"Unable to get custom objects: {e}")
+            self.user_discovery_logger.warning(f"Unable to get custom objects: {e}")
             return []
 
     def get_access_token(self) -> str:
