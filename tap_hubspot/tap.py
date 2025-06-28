@@ -83,10 +83,12 @@ class TapHubspot(Tap):
 
         custom_objects = self.get_custom_objects()
         for custom_object in custom_objects:
+            user_logger.info(f"Discovered custom object: {custom_object['object_name']}")
             streams_list.append(
                 streams.CustomObjectStream(
                     tap=self,
-                    object_name=custom_object["object_qualified_name"],
+                    object_name=custom_object["object_name"],
+                    object_qualified_name=custom_object["object_qualified_name"],
                     object_type_id=custom_object["object_type_id"],
                 )
             )
@@ -130,8 +132,10 @@ class TapHubspot(Tap):
             response = requests.get(endpoint, headers=headers)
             response.raise_for_status()
             custom_objects = response.json()["results"]
+            user_logger.info(f"Found {len(custom_objects)} custom objects")
             return [
                 {
+                    "object_name": custom_object["name"],
                     "object_qualified_name": custom_object["fullyQualifiedName"],
                     "object_type_id": custom_object["objectTypeId"],
                 }

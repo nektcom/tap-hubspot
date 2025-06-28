@@ -124,6 +124,7 @@ class CustomObjectStream(DynamicIncrementalHubspotStream):
         self,
         tap: Tap,
         object_name: str,
+        object_qualified_name: str,
         object_type_id: str,
         schema: str | PathLike | dict[str, Any] | Schema | None = None,
         *args,
@@ -131,6 +132,7 @@ class CustomObjectStream(DynamicIncrementalHubspotStream):
     ) -> None:
         self.object_name = object_name
         self.object_type_id = object_type_id
+        self.object_qualified_name = object_qualified_name
         super().__init__(tap, schema, *args, **kwargs)
 
     @property
@@ -149,6 +151,10 @@ class CustomObjectStream(DynamicIncrementalHubspotStream):
         # Allow parent classes to set the path for incremental searches
         # Store the value in a private attribute
         self._path = value
+
+    @property
+    def properties_path(self) -> str:
+        return self.object_qualified_name
 
     @property
     def incremental_path(self) -> str:

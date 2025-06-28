@@ -11,7 +11,6 @@ import requests
 from nekt_singer_sdk import typing as th
 from nekt_singer_sdk.authenticators import BearerTokenAuthenticator
 from nekt_singer_sdk.custom_logger import user_logger
-from nekt_singer_sdk.pagination import BaseAPIPaginator
 from nekt_singer_sdk.streams import RESTStream
 from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL
 from tap_hubspot.auth import HubSpotOAuthAuthenticator
@@ -104,6 +103,10 @@ class DynamicHubspotStream(HubspotStream):
         # TODO: consider typing more precisely
         return th.StringType()
 
+    @property
+    def properties_path(self) -> str:
+        return self.name
+
     @cached_property
     def schema(self) -> dict:
         """Return a draft JSON schema for this stream."""
@@ -128,7 +131,7 @@ class DynamicHubspotStream(HubspotStream):
         session.auth = self.authenticator
 
         resp = session.get(
-            f"https://api.hubapi.com/crm/v3/properties/{self.name}",
+            f"https://api.hubapi.com/crm/v3/properties/{self.properties_path}",
         )
         resp.raise_for_status()
         results = resp.json().get("results", [])
