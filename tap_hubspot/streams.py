@@ -4,10 +4,13 @@ from __future__ import annotations
 
 from functools import cached_property
 from http import HTTPStatus
-from pathlib import Path
+from os import PathLike
+from typing import Any
 
 import requests
-from singer_sdk import typing as th  # JSON Schema typing helpers
+from nekt_singer_sdk import typing as th  # JSON Schema typing helpers
+from nekt_singer_sdk.singerlib.schema import Schema
+from nekt_singer_sdk.tap_base import Tap
 from tap_hubspot.client import (
     DynamicHubspotStream,
     DynamicIncrementalHubspotStream,
@@ -48,18 +51,11 @@ class ContactStream(DynamicIncrementalHubspotStream):
 
     @cached_property
     def associations_string_list(self) -> list[str]:
-        return (
-            self.config.get("extract_contact_associations_comma_separated_string")
-            .replace(" ", "")
-            .split(",")
-        )
+        return self.config.get("extract_contact_associations_comma_separated_string").replace(" ", "").split(",")
 
     @cached_property
     def should_extract_associations(self) -> bool:
-        return (
-            self.config.get("extract_contact_associations")
-            and self.associations_string_list
-        )
+        return self.config.get("extract_contact_associations") and self.associations_string_list
 
     @cached_property
     def schema(self) -> dict:
@@ -98,11 +94,61 @@ class ContactStream(DynamicIncrementalHubspotStream):
             return super().post_process(row, context)
 
         associations_data = response.json().get("associations", {})
-        row["associations"] = {
-            k: v.get("results") for k, v in associations_data.items()
-        }
+        row["associations"] = {k: v.get("results") for k, v in associations_data.items()}
 
         return super().post_process(row, context)
+
+    @property
+    def url_base(self) -> str:
+        """
+        Returns an updated path which includes the api version
+        """
+        return "https://api.hubapi.com/crm/v3"
+
+
+class CustomObjectStream(DynamicIncrementalHubspotStream):
+    """
+    https://developers.hubspot.com/docs/api/crm/contacts
+    """
+
+    """
+    name: stream name
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    primary_keys = primary keys for the table
+    replication_key = datetime keys for replication
+    records_jsonpath = json response body
+    """
+
+    def __init__(
+        self,
+        tap: Tap,
+        object_name: str,
+        object_type_id: str,
+        schema: str | PathLike | dict[str, Any] | Schema | None = None,
+        *args,
+        **kwargs,
+    ) -> None:
+        self.object_name = object_name
+        self.object_type_id = object_type_id
+        super().__init__(tap, schema, *args, **kwargs)
+
+    @property
+    def name(self) -> str:
+        return f"{self.object_name}"
+
+    @property
+    def path(self) -> str:
+        return f"/objects/{self.object_type_id}"
+
+    @property
+    def incremental_path(self) -> str:
+        return f"/objects/{self.object_type_id}/search"
+
+    primary_keys = ["id"]
+    replication_key = "hs_lastmodifieddate"
+    replication_method = "INCREMENTAL"
+    records_jsonpath = "$.results[*]"  # Or override `parse_response`.
 
     @property
     def url_base(self) -> str:
@@ -1226,15 +1272,11 @@ class PropertyNotesStream(HubspotStream):
         property_product = PropertyProductStream(self._tap, schema={"properties": {}})
         property_lineitem = PropertyLineItemStream(self._tap, schema={"properties": {}})
         property_email = PropertyEmailStream(self._tap, schema={"properties": {}})
-        property_postalmail = PropertyPostalMailStream(
-            self._tap, schema={"properties": {}}
-        )
+        property_postalmail = PropertyPostalMailStream(self._tap, schema={"properties": {}})
         property_call = PropertyCallStream(self._tap, schema={"properties": {}})
         property_meeting = PropertyMeetingStream(self._tap, schema={"properties": {}})
         property_task = PropertyTaskStream(self._tap, schema={"properties": {}})
-        property_communication = PropertyCommunicationStream(
-            self._tap, schema={"properties": {}}
-        )
+        property_communication = PropertyCommunicationStream(self._tap, schema={"properties": {}})
         property_records = (
             list(property_ticket.get_records(context))
             + list(property_deal.get_records(context))
@@ -1308,18 +1350,11 @@ class DealStream(DynamicIncrementalHubspotStream):
 
     @cached_property
     def associations_string_list(self) -> list[str]:
-        return (
-            self.config.get("extract_deal_associations_comma_separated_string")
-            .replace(" ", "")
-            .split(",")
-        )
+        return self.config.get("extract_deal_associations_comma_separated_string").replace(" ", "").split(",")
 
     @cached_property
     def should_extract_associations(self) -> bool:
-        return (
-            self.config.get("extract_deal_associations")
-            and self.associations_string_list
-        )
+        return self.config.get("extract_deal_associations") and self.associations_string_list
 
     @cached_property
     def schema(self) -> dict:
@@ -1365,9 +1400,7 @@ class DealStream(DynamicIncrementalHubspotStream):
             return super().post_process(row, context)
 
         associations_data = response.json().get("associations", {})
-        row["associations"] = {
-            k: v.get("results") for k, v in associations_data.items()
-        }
+        row["associations"] = {k: v.get("results") for k, v in associations_data.items()}
 
         return super().post_process(row, context)
 

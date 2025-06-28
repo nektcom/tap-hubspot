@@ -8,12 +8,12 @@ from functools import cached_property
 from typing import Any, Callable
 
 import requests
-from custom_logger import user_logger
-from singer_sdk import typing as th
-from singer_sdk.authenticators import BearerTokenAuthenticator
-from singer_sdk.pagination import BaseAPIPaginator
-from singer_sdk.streams import RESTStream
-from singer_sdk.streams.core import REPLICATION_INCREMENTAL
+from nekt_singer_sdk import typing as th
+from nekt_singer_sdk.authenticators import BearerTokenAuthenticator
+from nekt_singer_sdk.custom_logger import user_logger
+from nekt_singer_sdk.pagination import BaseAPIPaginator
+from nekt_singer_sdk.streams import RESTStream
+from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL
 from tap_hubspot.auth import HubSpotOAuthAuthenticator
 
 if sys.version_info < (3, 11):

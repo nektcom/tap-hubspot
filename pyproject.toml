@@ -14,17 +14,15 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "<3.12,>=3.10"
+python = ">=3.11"
 backports-datetime-fromisoformat = {version = "^2.0.1", python = "<3.11"}
 cached-property = "^1" # Remove after Python 3.7 support is dropped
 fs-s3fs = { version = "^1.1.1", optional = true }
 requests = "^2.28.2"
-singer-sdk = { version="^0.33.1" }
 
-custom-logger = {git = "https://github.com/nektcom/nekt-custom-logger-module.git", rev = "v0.0.6"}
+nekt-singer-sdk = {git = "https://github.com/nektcom/singer-sdk.git"}
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.1"
-singer-sdk = { version="^0.33.1", extras = ["testing"] }
 
 [tool.isort]
 profile = "black"
