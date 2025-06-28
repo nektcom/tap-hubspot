@@ -139,7 +139,16 @@ class CustomObjectStream(DynamicIncrementalHubspotStream):
 
     @property
     def path(self) -> str:
+        # Use the private attribute if it's been set, otherwise compute the value
+        if hasattr(self, "_path"):
+            return self._path
         return f"/objects/{self.object_type_id}"
+
+    @path.setter
+    def path(self, value: str) -> None:
+        # Allow parent classes to set the path for incremental searches
+        # Store the value in a private attribute
+        self._path = value
 
     @property
     def incremental_path(self) -> str:

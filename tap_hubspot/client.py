@@ -37,7 +37,7 @@ class HubspotStream(RESTStream):
     records_jsonpath = "$[*]"  # Or override `parse_response`.
 
     # Set this value or override `get_new_paginator`.
-    next_page_token_jsonpath = "$.next_page"
+    next_page_token_jsonpath = "$.paging.next.after"
 
     @cached_property
     def authenticator(self) -> _Auth:
@@ -69,39 +69,6 @@ class HubspotStream(RESTStream):
         if "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")
         return headers
-
-    def get_new_paginator(self) -> BaseAPIPaginator:
-        """Create a new pagination helper instance.
-
-        If the source API can make use of the `next_page_token_jsonpath`
-        attribute, or it contains a `X-Next-Page` header in the response
-        then you can remove this method.
-
-        If you need custom pagination that uses page numbers, "next" links, or
-        other approaches, please read the guide: https://sdk.meltano.com/en/v0.25.0/guides/pagination-classes.html.
-
-        Returns:
-            A pagination helper instance.
-        """
-        return super().get_new_paginator()
-
-    def get_next_page_token(
-        self,
-        response: requests.Response,
-        previous_token: t.Any | None,
-    ) -> t.Any | None:
-        """Return a token for identifying next page or None if no more pages."""
-        # If pagination is required, return a token which can be used to get the
-        #       next page. If this is the final page, return "None" to end the
-        #       pagination loop.
-        resp_json = response.json()
-        paging = resp_json.get("paging")
-
-        if paging is not None:
-            next_page_token = resp_json.get("paging", {}).get("next", {}).get("after")
-        else:
-            next_page_token = None
-        return next_page_token
 
     def get_url_params(
         self,
@@ -193,6 +160,7 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
     date_filter = None
     record_id_filter = None
     last_record_id = None
+    incremental_path = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -276,22 +244,14 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
         self.last_record_id = row.get("id")
         return row
 
-    def prepare_request(
-        self,
-        context: dict | None,
-        next_page_token: _TToken | None,
-    ) -> requests.PreparedRequest:
+    def prepare_request(self, context: dict | None, next_page_token: Any | None) -> requests.PreparedRequest:
         if self._is_incremental_search(context):
             # Search endpoints use POST request
             self.path = self.incremental_path
-            self.rest_method = "POST"
+            self.http_method = "POST"
         return super().prepare_request(context, next_page_token)
 
-    def prepare_request_payload(
-        self,
-        context: dict | None,
-        next_page_token: _TToken | None,
-    ) -> dict | None:
+    def prepare_request_payload(self, context: dict | None, next_page_token: Any | None) -> dict | None:
         """Prepare the data payload for the REST API request.
 
         By default, no payload will be sent (return None).
