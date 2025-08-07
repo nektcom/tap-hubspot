@@ -86,7 +86,7 @@ class ContactStream(DynamicIncrementalHubspotStream):
 
         details_url = f"{self.url_base}/objects/contacts/{row['id']}"
         params = {"associations": self.associations_string_list}
-        headers = {"Authorization": f"Bearer {self.config.get('access_token')}"}
+        headers = self.authenticator.auth_headers
         response = requests.get(details_url, params=params, headers=headers)
 
         if not response.status_code == HTTPStatus.OK:
@@ -1407,7 +1407,7 @@ class DealStream(DynamicIncrementalHubspotStream):
 
         details_url = f"{self.url_base}/objects/deals/{row['id']}"
         params = {"associations": self.associations_string_list}
-        headers = {"Authorization": f"Bearer {self.config.get('access_token')}"}
+        headers = self.authenticator.auth_headers
         response = requests.get(details_url, params=params, headers=headers)
 
         if not response.status_code == HTTPStatus.OK:
