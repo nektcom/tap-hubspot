@@ -8,6 +8,7 @@ from functools import cached_property
 from typing import Any, Callable
 
 import requests
+from ratelimit import limits, sleep_and_retry
 from nekt_singer_sdk import typing as th
 from nekt_singer_sdk.authenticators import BearerTokenAuthenticator
 from nekt_singer_sdk.custom_logger import user_logger
@@ -318,3 +319,22 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
             )
 
         return body
+
+    @sleep_and_retry
+    @limits(calls=100, period=10)  # 100 calls per 10 seconds (HubSpot API limit)
+    def _fetch_associations_with_retry(self, object_type: str, record_id: str, associations_list: list[str]) -> dict:
+        """Fetch associations for a single record with retry logic."""
+        details_url = f"{self.url_base}/objects/{object_type}/{record_id}"
+        params = {"associations": associations_list}
+        headers = self.authenticator.auth_headers
+        
+        try:
+            response = requests.get(details_url, params=params, headers=headers, timeout=30)
+            response.raise_for_status()
+            
+            associations_data = response.json().get("associations", {})
+            return {k: v.get("results") for k, v in associations_data.items()}
+            
+        except requests.exceptions.RequestException as e:
+            user_logger.warning(f"Failed to fetch associations for {object_type} {record_id}: {e}")
+            return {}

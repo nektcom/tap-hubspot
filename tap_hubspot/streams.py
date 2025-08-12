@@ -84,18 +84,7 @@ class ContactStream(DynamicIncrementalHubspotStream):
         if not self.should_extract_associations:
             return super().post_process(row, context)
 
-        details_url = f"{self.url_base}/objects/contacts/{row['id']}"
-        params = {"associations": self.associations_string_list}
-        headers = self.authenticator.auth_headers
-        response = requests.get(details_url, params=params, headers=headers)
-
-        if not response.status_code == HTTPStatus.OK:
-            row["associations"] = {}
-            return super().post_process(row, context)
-
-        associations_data = response.json().get("associations", {})
-        row["associations"] = {k: v.get("results") for k, v in associations_data.items()}
-
+        row["associations"] = self._fetch_associations_with_retry("contacts", row['id'], self.associations_string_list)
         return super().post_process(row, context)
 
     @property
@@ -1405,18 +1394,7 @@ class DealStream(DynamicIncrementalHubspotStream):
         if not self.should_extract_associations:
             return super().post_process(row, context)
 
-        details_url = f"{self.url_base}/objects/deals/{row['id']}"
-        params = {"associations": self.associations_string_list}
-        headers = self.authenticator.auth_headers
-        response = requests.get(details_url, params=params, headers=headers)
-
-        if not response.status_code == HTTPStatus.OK:
-            row["associations"] = {}
-            return super().post_process(row, context)
-
-        associations_data = response.json().get("associations", {})
-        row["associations"] = {k: v.get("results") for k, v in associations_data.items()}
-
+        row["associations"] = self._fetch_associations_with_retry("deals", row['id'], self.associations_string_list)
         return super().post_process(row, context)
 
 
