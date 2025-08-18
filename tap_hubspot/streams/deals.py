@@ -1,0 +1,74 @@
+from __future__ import annotations
+
+from functools import cached_property
+
+from nekt_singer_sdk import typing as th  # JSON Schema typing helpers
+from tap_hubspot.client import DynamicIncrementalHubspotStream
+
+
+class DealStream(DynamicIncrementalHubspotStream):
+    """
+    https://developers.hubspot.com/docs/api/crm/deals
+    """
+
+    """
+    name: stream name
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    primary_keys = primary keys for the table
+    replication_key = datetime keys for replication
+    records_jsonpath = json response body
+    """
+
+    name = "deals"
+    path = "/objects/deals"
+    incremental_path = "/objects/deals/search"
+    primary_keys = ["id"]
+    replication_key = "hs_lastmodifieddate"
+    replication_method = "INCREMENTAL"
+    records_jsonpath = "$[results][*]"  # Or override `parse_response`.
+
+    @cached_property
+    def associations_string_list(self) -> list[str]:
+        return self.config.get("extract_deal_associations_comma_separated_string").replace(" ", "").split(",")
+
+    @cached_property
+    def should_extract_associations(self) -> bool:
+        return self.config.get("extract_deal_associations") and self.associations_string_list
+
+    @cached_property
+    def schema(self) -> dict:
+        schema = super().schema
+        if not self.should_extract_associations:
+            return schema
+
+        associations_schema = th.PropertiesList()
+        for association_string in self.associations_string_list:
+            associations_schema.append(
+                th.Property(
+                    association_string,
+                    th.ArrayType(
+                        th.ObjectType(
+                            th.Property("id", th.StringType),
+                            th.Property("type", th.StringType),
+                        )
+                    ),
+                )
+            )
+
+        schema["properties"]["associations"] = associations_schema.to_dict()
+        return schema
+
+    @property
+    def url_base(self) -> str:
+        """
+        Returns an updated path which includes the api version
+        """
+        return "https://api.hubapi.com/crm/v3"
+
+    def post_process(self, row, context=None):
+        if not self.should_extract_associations:
+            return super().post_process(row, context)
+
+        row["associations"] = self._fetch_associations_with_retry("deals", row["id"], self.associations_string_list)
+        return super().post_process(row, context)

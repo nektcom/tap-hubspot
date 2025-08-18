@@ -8,7 +8,32 @@ import requests
 from nekt_singer_sdk import typing as th
 from nekt_singer_sdk.custom_logger import user_logger
 from nekt_singer_sdk.tap_base import Tap
-from tap_hubspot import streams
+from tap_hubspot.client import HubspotStream
+from tap_hubspot.streams import (
+    CallStream,
+    CommunicationStream,
+    CompanyStream,
+    ContactStream,
+    CustomObjectStream,
+    DealPipelineStream,
+    DealStream,
+    EmailStream,
+    EmailSubscriptionStream,
+    FeedbackSubmissionsStream,
+    GoalStream,
+    LineItemStream,
+    MeetingStream,
+    NoteStream,
+    OwnersStream,
+    PostalMailStream,
+    ProductStream,
+    PropertyNotesStream,
+    QuoteStream,
+    TaskStream,
+    TicketPipelineStream,
+    TicketStream,
+    UsersStream,
+)
 
 
 class TapHubspot(Tap):
@@ -73,7 +98,7 @@ class TapHubspot(Tap):
         ),
     ).to_dict()
 
-    def discover_streams(self) -> list[streams.HubspotStream]:
+    def discover_streams(self) -> list[HubspotStream]:
         """Return a list of discovered streams.
 
         Returns:
@@ -85,7 +110,7 @@ class TapHubspot(Tap):
         for custom_object in custom_objects:
             self.user_discovery_logger.info(f"Discovered custom object: {custom_object['object_name']}")
             streams_list.append(
-                streams.CustomObjectStream(
+                CustomObjectStream(
                     tap=self,
                     object_name=custom_object["object_name"],
                     object_qualified_name=custom_object["object_qualified_name"],
@@ -95,28 +120,28 @@ class TapHubspot(Tap):
 
         streams_list.extend(
             [
-                streams.ContactStream(self),
-                streams.UsersStream(self),
-                streams.OwnersStream(self),
-                streams.TicketPipelineStream(self),
-                streams.DealPipelineStream(self),
-                # streams.EmailSubscriptionStream(self),
-                streams.PropertyNotesStream(self),
-                streams.CompanyStream(self),
-                streams.DealStream(self),
-                # streams.FeedbackSubmissionsStream(self),
-                streams.LineItemStream(self),
-                streams.ProductStream(self),
-                streams.TicketStream(self),
-                streams.QuoteStream(self),
-                # streams.GoalStream(self),
-                streams.CallStream(self),
-                streams.CommunicationStream(self),
-                streams.EmailStream(self),
-                streams.MeetingStream(self),
-                streams.NoteStream(self),
-                streams.PostalMailStream(self),
-                streams.TaskStream(self),
+                ContactStream(self),
+                UsersStream(self),
+                OwnersStream(self),
+                TicketPipelineStream(self),
+                DealPipelineStream(self),
+                # EmailSubscriptionStream(self),
+                PropertyNotesStream(self),
+                CompanyStream(self),
+                DealStream(self),
+                # FeedbackSubmissionsStream(self),
+                LineItemStream(self),
+                ProductStream(self),
+                TicketStream(self),
+                QuoteStream(self),
+                # GoalStream(self),
+                CallStream(self),
+                CommunicationStream(self),
+                EmailStream(self),
+                MeetingStream(self),
+                NoteStream(self),
+                PostalMailStream(self),
+                TaskStream(self),
             ]
         )
 
