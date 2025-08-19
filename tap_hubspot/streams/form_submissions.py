@@ -26,7 +26,7 @@ class FormSubmissionsStream(HubspotStream):
     primary_keys = ["conversionId"]
     records_jsonpath = "$[results][*]"
     replication_key = "submittedAt"
-    parent_stream = FormsStream
+    parent_stream_type = FormsStream
     state_partitioning_keys = ["form_id"]
     page_size = 50
 
@@ -38,6 +38,7 @@ class FormSubmissionsStream(HubspotStream):
             "values",
             th.ArrayType(
                 th.ObjectType(
+                    th.Property("objectTypeId", th.StringType),
                     th.Property("name", th.StringType),
                     th.Property("value", th.StringType),
                 )
@@ -47,7 +48,7 @@ class FormSubmissionsStream(HubspotStream):
     ).to_dict()
 
     def post_process(self, row: dict[str, Any], context: Mapping[str, Any] | None = None) -> dict | None:
-        row["form_id"] = context["form_id"]
+        row["formId"] = context["form_id"]
         return super().post_process(row, context)
 
     @property

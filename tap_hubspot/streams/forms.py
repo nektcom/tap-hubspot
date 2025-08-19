@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from nekt_singer_sdk import typing as th  # JSON Schema typing helpers
+from nekt_singer_sdk.helpers.types import Context, Record
 from tap_hubspot.client import HubspotStream
 
 
@@ -47,11 +48,27 @@ class FormsStream(HubspotStream):
                                 th.Property("required", th.BooleanType),
                                 th.Property("hidden", th.BooleanType),
                                 th.Property("fieldType", th.StringType),
+                                th.Property("useCountryCodeSelect", th.BooleanType),
+                                th.Property(
+                                    "options",
+                                    th.ArrayType(
+                                        th.ObjectType(
+                                            th.Property("label", th.StringType),
+                                            th.Property("value", th.StringType),
+                                            th.Property("description", th.StringType),
+                                            th.Property("displayOrder", th.IntegerType),
+                                        )
+                                    ),
+                                ),
                                 th.Property(
                                     "validation",
                                     th.ObjectType(
                                         th.Property("blockedEmailDomains", th.ArrayType(th.StringType)),
                                         th.Property("useDefaultBlockList", th.BooleanType),
+                                        th.Property("minAllowedDigits", th.IntegerType),
+                                        th.Property("maxAllowedDigits", th.IntegerType),
+                                        th.Property("minAllowedCharacters", th.IntegerType),
+                                        th.Property("maxAllowedCharacters", th.IntegerType),
                                     ),
                                 ),
                             )
@@ -132,7 +149,11 @@ class FormsStream(HubspotStream):
         """
         return "https://api.hubapi.com/marketing/v3"
 
-    def get_child_context(self, record: dict) -> dict:
+    def get_child_context(
+        self,
+        record: Record,
+        context: Context | None,
+    ) -> Context | None:
         """
         Returns a child context for the form submissions stream
         """
