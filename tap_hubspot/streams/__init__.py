@@ -8,6 +8,8 @@ from .deals import DealStream
 from .email_subscription import EmailSubscriptionStream
 from .emails import EmailStream
 from .feedback_submission import FeedbackSubmissionsStream
+from .form_submissions import FormSubmissionsStream
+from .forms import FormsStream
 from .goals import GoalStream
 from .line_item import LineItemStream
 from .meetings import MeetingStream

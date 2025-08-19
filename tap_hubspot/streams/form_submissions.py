@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from nekt_singer_sdk import typing as th  # JSON Schema typing helpers
+from typing import Any, Mapping
+
+from nekt_singer_sdk import typing as th
 from tap_hubspot.client import HubspotStream
 from tap_hubspot.streams.forms import FormsStream
 
@@ -26,9 +28,11 @@ class FormSubmissionsStream(HubspotStream):
     replication_key = "submittedAt"
     parent_stream = FormsStream
     state_partitioning_keys = ["form_id"]
+    page_size = 50
 
     schema = th.PropertiesList(
         th.Property("conversionId", th.StringType),
+        th.Property("formId", th.StringType),
         th.Property("submittedAt", th.IntegerType),
         th.Property(
             "values",
@@ -41,6 +45,10 @@ class FormSubmissionsStream(HubspotStream):
         ),
         th.Property("pageUrl", th.StringType),
     ).to_dict()
+
+    def post_process(self, row: dict[str, Any], context: Mapping[str, Any] | None = None) -> dict | None:
+        row["form_id"] = context["form_id"]
+        return super().post_process(row, context)
 
     @property
     def url_base(self) -> str:

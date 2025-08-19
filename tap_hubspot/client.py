@@ -8,12 +8,12 @@ from functools import cached_property
 from typing import Any, Callable
 
 import requests
-from ratelimit import limits, sleep_and_retry
 from nekt_singer_sdk import typing as th
 from nekt_singer_sdk.authenticators import BearerTokenAuthenticator
 from nekt_singer_sdk.custom_logger import user_logger
 from nekt_singer_sdk.streams import RESTStream
 from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL
+from ratelimit import limits, sleep_and_retry
 from tap_hubspot.auth import HubSpotOAuthAuthenticator
 
 if sys.version_info < (3, 11):
@@ -34,10 +34,9 @@ class HubspotStream(RESTStream):
         """
         return "https://api.hubapi.com/"
 
-    records_jsonpath = "$[*]"  # Or override `parse_response`.
-
-    # Set this value or override `get_new_paginator`.
+    records_jsonpath = "$[*]"
     next_page_token_jsonpath = "$.paging.next.after"
+    page_size = 100
 
     @cached_property
     def authenticator(self) -> _Auth:
@@ -85,7 +84,7 @@ class HubspotStream(RESTStream):
             A dictionary of URL query parameters.
         """
         params: dict = {}
-        params["limit"] = 100
+        params["limit"] = self.page_size
         if next_page_token:
             params["after"] = next_page_token
         if self.replication_key:
@@ -327,14 +326,14 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
         details_url = f"{self.url_base}/objects/{object_type}/{record_id}"
         params = {"associations": associations_list}
         headers = self.authenticator.auth_headers
-        
+
         try:
             response = requests.get(details_url, params=params, headers=headers, timeout=30)
             response.raise_for_status()
-            
+
             associations_data = response.json().get("associations", {})
             return {k: v.get("results") for k, v in associations_data.items()}
-            
+
         except requests.exceptions.RequestException as e:
             user_logger.warning(f"Failed to fetch associations for {object_type} {record_id}: {e}")
             return {}

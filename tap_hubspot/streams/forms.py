@@ -22,6 +22,7 @@ class FormsStream(HubspotStream):
     path = "/forms"
     primary_keys = ["id"]
     records_jsonpath = "$[results][*]"
+    page_size = 50
 
     schema = th.PropertiesList(
         th.Property("id", th.StringType),
