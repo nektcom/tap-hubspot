@@ -321,19 +321,34 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
 
     @sleep_and_retry
     @limits(calls=100, period=10)  # 100 calls per 10 seconds (HubSpot API limit)
-    def _fetch_associations_with_retry(self, object_type: str, record_id: str, associations_list: list[str]) -> dict:
-        """Fetch associations for a single record with retry logic."""
+    def _fetch_additional_data_with_retry(
+        self,
+        object_type: str,
+        record_id: str,
+        associations_list: list[str] = None,
+        property_history_list: list[str] = None,
+    ) -> dict:
+        """Fetch additional data for a single record with retry logic."""
         details_url = f"{self.url_base}/objects/{object_type}/{record_id}"
-        params = {"associations": associations_list}
+        params = {}
+        if associations_list:
+            params["associations"] = associations_list
+        if property_history_list:
+            params["propertiesWithHistory"] = property_history_list
         headers = self.authenticator.auth_headers
 
         try:
             response = requests.get(details_url, params=params, headers=headers, timeout=30)
             response.raise_for_status()
 
-            associations_data = response.json().get("associations", {})
-            return {k: v.get("results") for k, v in associations_data.items()}
+            response_payload = response.json()
+            associations_data = response_payload.get("associations", {})
+            property_history_data = response_payload.get("propertiesWithHistory", {})
+            return {
+                "associations": {k: v.get("results") for k, v in associations_data.items()},
+                "propertiesWithHistory": {k: v for k, v in property_history_data.items()},
+            }
 
         except requests.exceptions.RequestException as e:
-            user_logger.warning(f"Failed to fetch associations for {object_type} {record_id}: {e}")
+            user_logger.warning(f"Failed to fetch additional data for {object_type} {record_id}: {e}")
             return {}

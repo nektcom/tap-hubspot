@@ -33,31 +33,69 @@ class DealStream(DynamicIncrementalHubspotStream):
         return self.config.get("extract_deal_associations_comma_separated_string").replace(" ", "").split(",")
 
     @cached_property
+    def property_history_string_list(self) -> list[str]:
+        return self.config.get("extract_deal_property_history_comma_separated_string").replace(" ", "").split(",")
+
+    @cached_property
     def should_extract_associations(self) -> bool:
         return self.config.get("extract_deal_associations") and self.associations_string_list
 
     @cached_property
+    def should_extract_property_history(self) -> bool:
+        return self.config.get("extract_deal_property_history") and self.property_history_string_list
+
+    @cached_property
     def schema(self) -> dict:
         schema = super().schema
-        if not self.should_extract_associations:
-            return schema
+        if self.should_extract_associations:
+            associations_schema = th.PropertiesList()
+            for association_string in self.associations_string_list:
+                associations_schema.append(
+                    th.Property(
+                        association_string,
+                        th.ArrayType(
+                            th.ObjectType(
+                                th.Property("id", th.StringType),
+                                th.Property("type", th.StringType),
+                            )
+                        ),
+                    )
+                )
 
-        associations_schema = th.PropertiesList()
-        for association_string in self.associations_string_list:
-            associations_schema.append(
-                th.Property(
-                    association_string,
-                    th.ArrayType(
-                        th.ObjectType(
-                            th.Property("id", th.StringType),
-                            th.Property("type", th.StringType),
-                        )
-                    ),
+            schema["properties"]["associations"] = associations_schema.to_dict()
+        if self.should_extract_property_history:
+            property_history_schema = th.PropertiesList()
+            property_history_properties = th.ArrayType(
+                th.ObjectType(
+                    th.Property("sourceType", th.StringType),
+                    th.Property("sourceId", th.StringType),
+                    th.Property("updatedByUserId", th.StringType),
+                    th.Property("value", th.StringType),
+                    th.Property("timestamp", th.StringType),
                 )
             )
-
-        schema["properties"]["associations"] = associations_schema.to_dict()
+            for property_name in self.property_history_string_list:
+                property_history_schema.append(th.Property(property_name, property_history_properties))
+            schema["properties"]["propertiesWithHistory"] = property_history_schema.to_dict()
         return schema
+
+    def post_process(self, row, context=None):
+        if not (self.should_extract_associations or self.should_extract_property_history):
+            return super().post_process(row, context)
+
+        additional_data = self._fetch_additional_data_with_retry(
+            "deals",
+            row["id"],
+            self.associations_string_list if self.should_extract_associations else None,
+            self.property_history_string_list if self.should_extract_property_history else None,
+        )
+
+        if "associations" in additional_data:
+            row["associations"] = additional_data["associations"]
+        if "propertiesWithHistory" in additional_data:
+            row["propertiesWithHistory"] = additional_data["propertiesWithHistory"]
+
+        return super().post_process(row, context)
 
     @property
     def url_base(self) -> str:
@@ -65,10 +103,3 @@ class DealStream(DynamicIncrementalHubspotStream):
         Returns an updated path which includes the api version
         """
         return "https://api.hubapi.com/crm/v3"
-
-    def post_process(self, row, context=None):
-        if not self.should_extract_associations:
-            return super().post_process(row, context)
-
-        row["associations"] = self._fetch_associations_with_retry("deals", row["id"], self.associations_string_list)
-        return super().post_process(row, context)

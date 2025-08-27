@@ -98,6 +98,34 @@ class TapHubspot(Tap):
             default="calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks, tickets",
             description="Comma separated string with the name of entities that should be extracted",
         ),
+        th.Property(
+            "extract_contact_property_history",
+            th.BooleanType,
+            default=False,
+            required=True,
+            description="Enable the extraction of property history for contacts",
+        ),
+        th.Property(
+            "extract_contact_property_history_comma_separated_string",
+            th.StringType,
+            required=False,
+            default="lifecyclestage,lead_status",
+            description="Comma separated string with the name of properties that should be extracted with history.",
+        ),
+        th.Property(
+            "extract_deal_property_history",
+            th.BooleanType,
+            default=False,
+            required=True,
+            description="Enable the extraction of property history for deals",
+        ),
+        th.Property(
+            "extract_deal_property_history_comma_separated_string",
+            th.StringType,
+            required=False,
+            default="dealstage",
+            description="Comma separated string with the name of properties that should be extracted with history.",
+        ),
     ).to_dict()
 
     def discover_streams(self) -> list[HubspotStream]:
