@@ -69,7 +69,7 @@ class DealStream(DynamicIncrementalHubspotStream):
                 th.ObjectType(
                     th.Property("sourceType", th.StringType),
                     th.Property("sourceId", th.StringType),
-                    th.Property("updatedByUserId", th.StringType),
+                    th.Property("updatedByUserId", th.IntegerType),
                     th.Property("value", th.StringType),
                     th.Property("timestamp", th.StringType),
                 )
