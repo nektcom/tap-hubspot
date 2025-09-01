@@ -5,6 +5,7 @@ from __future__ import annotations
 import datetime
 import sys
 from functools import cached_property
+from http import HTTPStatus
 from typing import Any, Callable
 
 import pendulum
@@ -51,6 +52,7 @@ class HubspotStream(RESTStream):
             return HubSpotOAuthAuthenticator(
                 self,
                 auth_endpoint="https://api.hubapi.com/oauth/v1/token",
+                default_expiration=1800,
             )
         else:
             return BearerTokenAuthenticator(
@@ -340,20 +342,33 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
             params["associations"] = associations_list
         if property_history_list:
             params["propertiesWithHistory"] = property_history_list
-        headers = self.authenticator.auth_headers
 
-        try:
-            response = requests.get(details_url, params=params, headers=headers, timeout=30)
-            response.raise_for_status()
+        max_retries = 5
+        for attempt in range(max_retries):
+            headers = {"Authorization": f"Bearer {self.authenticator.access_token}"}
 
-            response_payload = response.json()
-            associations_data = response_payload.get("associations", {})
-            property_history_data = response_payload.get("propertiesWithHistory", {})
-            return {
-                "associations": {k: v.get("results") for k, v in associations_data.items()},
-                "propertiesWithHistory": {k: v for k, v in property_history_data.items()},
-            }
+            try:
+                response = requests.get(details_url, params=params, headers=headers, timeout=30)
+                response.raise_for_status()
 
-        except requests.exceptions.RequestException as e:
-            user_logger.warning(f"Failed to fetch additional data for {object_type} {record_id}: {e}")
-            return {}
+                response_payload = response.json()
+                associations_data = response_payload.get("associations", {})
+                property_history_data = response_payload.get("propertiesWithHistory", {})
+                return {
+                    "associations": {k: v.get("results") for k, v in associations_data.items()},
+                    "propertiesWithHistory": {k: v for k, v in property_history_data.items()},
+                }
+
+            except requests.exceptions.HTTPError as e:
+                if e.response.status_code == HTTPStatus.UNAUTHORIZED and attempt < max_retries - 1:
+                    user_logger.warning(
+                        f"Token expired while fetching additional data for {object_type} {record_id}, refreshing token and retrying."
+                    )
+                    if hasattr(self.authenticator, "update_access_token"):
+                        self.authenticator.update_access_token()
+                    continue
+                user_logger.warning(f"Failed to fetch additional data for {object_type} {record_id}: {e}")
+                return {}
+            except requests.exceptions.RequestException as e:
+                user_logger.warning(f"Failed to fetch additional data for {object_type} {record_id}: {e}")
+                return {}
