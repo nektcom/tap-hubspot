@@ -7,12 +7,13 @@ import sys
 from functools import cached_property
 from typing import Any, Callable
 
+import pendulum
 import requests
 from nekt_singer_sdk import typing as th
 from nekt_singer_sdk.authenticators import BearerTokenAuthenticator
 from nekt_singer_sdk.custom_logger import user_logger
 from nekt_singer_sdk.streams import RESTStream
-from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL
+from nekt_singer_sdk.streams.core import REPLICATION_FULL_TABLE
 from ratelimit import limits, sleep_and_retry
 from tap_hubspot.auth import HubSpotOAuthAuthenticator
 
@@ -87,9 +88,6 @@ class HubspotStream(RESTStream):
         params["limit"] = self.page_size
         if next_page_token:
             params["after"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
         return params
 
 
@@ -169,12 +167,7 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
         super().__init__(*args, **kwargs)
 
     def _is_incremental_search(self, context):
-        return (
-            self.replication_method == REPLICATION_INCREMENTAL
-            and self.get_starting_replication_key_value(context)
-            and hasattr(self, "incremental_path")
-            and self.incremental_path
-        )
+        return self.replication_key and self.incremental_path is not None
 
     @cached_property
     def schema(self) -> dict:
@@ -268,18 +261,30 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
             next_page_token: Token, page number or any request argument to request the
                 next page of data.
         """
+        page_size = 200
         body = {}
 
         if self._is_incremental_search(context):
             # Only filter in case we have a value to filter on
             # https://developers.hubspot.com/docs/api/crm/search
             if self.date_filter is None:
-                self.date_filter = datetime.datetime.fromisoformat(self.get_starting_replication_key_value(context))
+                starting_timestamp = self.get_starting_replication_key_value(context)
+                if starting_timestamp and self.replication_method != REPLICATION_FULL_TABLE:
+                    self.date_filter = pendulum.parse(starting_timestamp)
+                    user_logger.info(
+                        f"[{self.name}] Starting incremental sync using search endpoint with timestamp: {self.date_filter.isoformat()}"
+                    )
+                elif self.config.get("start_date"):
+                    start_date = self.config.get("start_date")
+                    self.date_filter = pendulum.parse(start_date)
+                    user_logger.info(
+                        f"[{self.name}] Starting full table sync using search endpoint with start date: {self.date_filter.isoformat()}"
+                    )
 
             if next_page_token:
                 # Hubspot wont return more than 10k records so when we hit 10k we
                 # need to reset our epoch to most recent and not send the next_page_token
-                if int(next_page_token) + 100 >= 10000:
+                if int(next_page_token) + page_size >= 10_000:
                     user_logger.warning(
                         f'More than 10k objects in the search result. Updating record_id filter to "{self.last_record_id}" and date filter to "{self.date_filter.isoformat()}".'
                     )
@@ -305,14 +310,14 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
 
             body.update(
                 {
-                    "filterGroups": [{"filters": filters}],
+                    "filters": filters,
                     "sorts": [
                         {
                             "propertyName": "hs_object_id",
                             "direction": "ASCENDING",
                         }
                     ],
-                    "limit": 200,  # Hubspot sets a limit of most 200 per request. Default is 10
+                    "limit": page_size,  # Hubspot sets a limit of most 200 per request. Default is 10
                     "properties": list(self.hs_properties),
                 }
             )

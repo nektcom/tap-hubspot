@@ -25,7 +25,6 @@ class ContactStream(DynamicIncrementalHubspotStream):
     incremental_path = "/objects/contacts/search"
     primary_keys = ["id"]
     replication_key = "lastmodifieddate"
-    replication_method = "INCREMENTAL"
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     @cached_property

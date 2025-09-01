@@ -65,7 +65,6 @@ class CustomObjectStream(DynamicIncrementalHubspotStream):
 
     primary_keys = ["id"]
     replication_key = "hs_lastmodifieddate"
-    replication_method = "INCREMENTAL"
     records_jsonpath = "$.results[*]"  # Or override `parse_response`.
 
     @property
