@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from nekt_singer_sdk import typing as th  # JSON Schema typing helpers
-from tap_hubspot.client import HubspotStream
+from tap_hubspot.client import DynamicIncrementalHubspotStream
 
 
-class TicketStream(HubspotStream):
+class TicketStream(DynamicIncrementalHubspotStream):
     """
     https://developers.hubspot.com/docs/api/crm/tickets
     """
@@ -20,27 +20,10 @@ class TicketStream(HubspotStream):
 
     name = "tickets"
     path = "/objects/tickets"
+    incremental_path = "/objects/tickets/search"
     primary_keys = ["id"]
+    replication_key = "hs_lastmodifieddate"
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
-
-    schema = th.PropertiesList(
-        th.Property("id", th.StringType),
-        th.Property(
-            "properties",
-            th.ObjectType(
-                th.Property("createdate", th.StringType),
-                th.Property("hs_lastmodifieddate", th.StringType),
-                th.Property("hs_pipeline", th.StringType),
-                th.Property("hs_pipeline_stage", th.StringType),
-                th.Property("hs_ticket_priority", th.StringType),
-                th.Property("hubspot_owner_id", th.StringType),
-                th.Property("subject", th.StringType),
-            ),
-        ),
-        th.Property("createdAt", th.StringType),
-        th.Property("updatedAt", th.StringType),
-        th.Property("archived", th.BooleanType),
-    ).to_dict()
 
     @property
     def url_base(self) -> str:
