@@ -99,6 +99,20 @@ class TapHubspot(Tap):
             description="Comma separated string with the name of entities that should be extracted",
         ),
         th.Property(
+            "extract_ticket_associations",
+            th.BooleanType,
+            default=False,
+            required=True,
+            description="Enable the extraction of entities associated with tickets",
+        ),
+        th.Property(
+            "extract_ticket_associations_comma_separated_string",
+            th.StringType,
+            required=False,
+            default="calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks",
+            description="Comma separated string with the name of entities that should be extracted",
+        ),
+        th.Property(
             "extract_contact_property_history",
             th.BooleanType,
             default=False,
