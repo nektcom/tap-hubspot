@@ -23,6 +23,7 @@ from tap_hubspot.streams import (
     FormsStream,
     FormSubmissionsStream,
     GoalStream,
+    LeadsStream,
     LineItemStream,
     MeetingStream,
     NoteStream,
@@ -113,6 +114,20 @@ class TapHubspot(Tap):
             description="Comma separated string with the name of entities that should be extracted",
         ),
         th.Property(
+            "extract_lead_associations",
+            th.BooleanType,
+            default=False,
+            required=True,
+            description="Enable the extraction of entities associated with leads",
+        ),
+        th.Property(
+            "extract_lead_associations_comma_separated_string",
+            th.StringType,
+            required=False,
+            default="calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks, tickets",
+            description="Comma separated string with the name of entities that should be extracted",
+        ),
+        th.Property(
             "extract_contact_property_history",
             th.BooleanType,
             default=False,
@@ -188,6 +203,7 @@ class TapHubspot(Tap):
                 TaskStream(self),
                 FormsStream(self),
                 FormSubmissionsStream(self),
+                LeadsStream(self),
             ]
         )
 
