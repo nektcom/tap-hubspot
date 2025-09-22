@@ -162,7 +162,6 @@ class TapHubspot(Tap):
             required=True,
             description="Enable the extraction of leads, only available for accounts with HubSpot Pro, Enterprise, or Enterprise Plus",
         ),
-        th.Property(),
     ).to_dict()
 
     def discover_streams(self) -> list[HubspotStream]:
