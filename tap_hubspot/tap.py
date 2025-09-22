@@ -155,6 +155,14 @@ class TapHubspot(Tap):
             default="dealstage",
             description="Comma separated string with the name of properties that should be extracted with history.",
         ),
+        th.Property(
+            "enable_leads_stream",
+            th.BooleanType,
+            default=False,
+            required=True,
+            description="Enable the extraction of leads, only available for accounts with HubSpot Pro, Enterprise, or Enterprise Plus",
+        ),
+        th.Property(),
     ).to_dict()
 
     def discover_streams(self) -> list[HubspotStream]:
@@ -176,6 +184,9 @@ class TapHubspot(Tap):
                     object_type_id=custom_object["object_type_id"],
                 )
             )
+
+        if self.config.get("enable_leads_stream"):
+            streams_list.append(LeadsStream(self))
 
         streams_list.extend(
             [
@@ -203,7 +214,6 @@ class TapHubspot(Tap):
                 TaskStream(self),
                 FormsStream(self),
                 FormSubmissionsStream(self),
-                LeadsStream(self),
             ]
         )
 
