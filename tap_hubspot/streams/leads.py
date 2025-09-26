@@ -24,7 +24,7 @@ class LeadsStream(DynamicIncrementalHubspotStream):
     path = "/objects/leads"
     incremental_path = "/objects/leads/search"
     primary_keys = ["id"]
-    replication_key = "lastmodifieddate"
+    replication_key = "hs_lastmodifieddate"
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     @cached_property
