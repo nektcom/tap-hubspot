@@ -345,7 +345,11 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
 
         max_retries = 5
         for attempt in range(max_retries):
-            headers = self.authenticator.auth_headers
+            headers = (
+                self.authenticator.auth_headers
+                if self.config.get("access_token")
+                else {"Authorization": f"Bearer {self.authenticator.access_token}"}  # this ensures a token refresh
+            )
 
             try:
                 response = requests.get(details_url, params=params, headers=headers, timeout=30)
