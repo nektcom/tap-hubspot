@@ -1,8 +1,0 @@
-{
-  "name": "tap-hubspot",
-  "namespace": "tap_hubspot",
-  "variant": "meltanolabs",
-  "executable": "tap-hubspot",
-  "pip_url": "-e ./extract/tap-hubspot",
-  "capabilities": ["state", "catalog", "discover"]
-}
