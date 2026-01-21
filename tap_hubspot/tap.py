@@ -25,6 +25,7 @@ from tap_hubspot.streams import (
     GoalStream,
     LeadsStream,
     LineItemStream,
+    MarketingEmailStream,
     MeetingStream,
     NoteStream,
     OwnersStream,
@@ -213,6 +214,7 @@ class TapHubspot(Tap):
                 TaskStream(self),
                 FormsStream(self),
                 FormSubmissionsStream(self),
+                MarketingEmailStream(self),
             ]
         )
 

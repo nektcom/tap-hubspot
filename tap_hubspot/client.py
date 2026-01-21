@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import datetime
 import sys
 from functools import cached_property
 from http import HTTPStatus
@@ -90,6 +89,30 @@ class HubspotStream(RESTStream):
         params["limit"] = self.page_size
         if next_page_token:
             params["after"] = next_page_token
+        return params
+
+
+class HubspotIncrementalStream(HubspotStream):
+
+    replication_key_filter = None
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params = super().get_url_params(context, next_page_token)
+        if self.replication_key and self.replication_key_filter:
+            params[self.replication_key_filter] = self.get_starting_replication_key_value(context)
         return params
 
 

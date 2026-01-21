@@ -13,6 +13,7 @@ from .forms import FormsStream
 from .goals import GoalStream
 from .leads import LeadsStream
 from .line_item import LineItemStream
+from .marketing_emails import MarketingEmailStream
 from .meetings import MeetingStream
 from .notes import NoteStream
 from .owners import OwnersStream
