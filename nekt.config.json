@@ -163,7 +163,6 @@
             "default": false,
             "el_type": "extractor",
             "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4",
-            "dependent": "enable_leads_stream",
             "description": "Enable the extraction of entities associated with companies. Enable only if necessary, since it significantly increases the extraction time.",
             "advanced_settings": true
           },
