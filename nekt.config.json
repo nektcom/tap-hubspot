@@ -5,23 +5,22 @@
     "variant": "meltanolabs",
     "executable": "tap-hubspot",
     "pip_url": "-e ./extract/tap-hubspot",
-    "capabilities": ["state", "catalog", "discover"]
+    "capabilities": [
+      "state",
+      "catalog",
+      "discover"
+    ]
   },
   "connectors": [
     {
       "connector_slug": "hubspot",
       "config_template": {
         "type": "object",
-        "required": ["oauth_credentials", "start_date"],
+        "required": [
+          "oauth_credentials",
+          "start_date"
+        ],
         "properties": {
-          "start_date": {
-            "type": "string",
-            "order": 2,
-            "title": "Start date",
-            "format": "date",
-            "el_type": "extractor",
-            "description": "Records created or updated after the start date will be extracted from the source."
-          },
           "access_token": {
             "type": "string",
             "title": "Access token",
@@ -55,6 +54,14 @@
             },
             "description": "Please use a Hubspot account with Super Admin access. Using an account with insufficient permissions will result in an error."
           },
+          "start_date": {
+            "type": "string",
+            "order": 2,
+            "title": "Start date",
+            "format": "date",
+            "el_type": "extractor",
+            "description": "Records created or updated after the start date will be extracted from the source."
+          },
           "enable_leads_stream": {
             "type": "boolean",
             "order": 3,
@@ -66,7 +73,7 @@
           },
           "extract_deal_associations": {
             "type": "boolean",
-            "order": 3,
+            "order": 4,
             "title": "Extract deal associations",
             "default": false,
             "el_type": "extractor",
@@ -74,25 +81,15 @@
             "description": "Enable the extraction of entities associated with deals. Enable only if necessary, since it significantly increases the extraction time.",
             "advanced_settings": true
           },
-          "extract_lead_associations": {
-            "type": "boolean",
-            "order": 9,
-            "title": "Extract lead associations",
-            "default": false,
+          "extract_deal_associations_comma_separated_string": {
+            "type": "string",
+            "order": 5,
+            "title": "Deal associations entities (comma separated)",
+            "default": "calls, commerce_payments, communications, companies, contacts, deal_split, deals, emails, invoices, line_item, meetings, notes, orders, postal_mail, quotes, services, subscriptions, tasks, tickets",
             "el_type": "extractor",
-            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4",
-            "dependent": "enable_leads_stream",
-            "description": "Enable the extraction of entities associated with leads. Enable only if necessary, since it significantly increases the extraction time.",
-            "advanced_settings": true
-          },
-          "extract_ticket_associations": {
-            "type": "boolean",
-            "order": 7,
-            "title": "Extract ticket associations",
-            "default": false,
-            "el_type": "extractor",
-            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4",
-            "description": "Enable the extraction of entities associated with tickets. Enable only if necessary, since it significantly increases the extraction time.",
+            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4#deal-to-object",
+            "dependent": "extract_deal_associations",
+            "description": "Comma separated list with the name of entities that should be extracted, e.g.: \"companies, contacts\".",
             "advanced_settings": true
           },
           "extract_contact_associations": {
@@ -103,59 +100,6 @@
             "el_type": "extractor",
             "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4",
             "description": "Enable the extraction of entities associated with contacts. Enable only if necessary, since it significantly increases the extraction time.",
-            "advanced_settings": true
-          },
-          "extract_deal_property_history": {
-            "type": "boolean",
-            "order": 13,
-            "title": "Extract deal properties history",
-            "default": false,
-            "el_type": "extractor",
-            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/objects/deals#retrieve-deals",
-            "description": "Enable the extraction of properties history for deals. Enable only if necessary, since it significantly increases the extraction time.",
-            "advanced_settings": true
-          },
-          "extract_contact_property_history": {
-            "type": "boolean",
-            "order": 11,
-            "title": "Extract contact properties history",
-            "default": false,
-            "el_type": "extractor",
-            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/objects/contacts#retrieve-contacts-by-record-id%2C-email%2C-or-custom-unique-value-property",
-            "description": "Enable the extraction of properties history for contacts. Enable only if necessary, since it significantly increases the extraction time.",
-            "advanced_settings": true
-          },
-          "extract_deal_associations_comma_separated_string": {
-            "type": "string",
-            "order": 4,
-            "title": "Deal associations entities (comma separated)",
-            "default": "calls, commerce_payments, communications, companies, contacts, deal_split, deals, emails, invoices, line_item, meetings, notes, orders, postal_mail, quotes, services, subscriptions, tasks, tickets",
-            "el_type": "extractor",
-            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4#deal-to-object",
-            "dependent": "extract_deal_associations",
-            "description": "Comma separated list with the name of entities that should be extracted, e.g.: \"companies, contacts\".",
-            "advanced_settings": true
-          },
-          "extract_lead_associations_comma_separated_string": {
-            "type": "string",
-            "order": 10,
-            "title": "Lead associations entities (comma separated)",
-            "default": "calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks, tickets",
-            "el_type": "extractor",
-            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4#deal-to-object",
-            "dependent": "extract_lead_associations",
-            "description": "Comma separated list with the name of entities that should be extracted, e.g.: \"companies, contacts\".",
-            "advanced_settings": true
-          },
-          "extract_ticket_associations_comma_separated_string": {
-            "type": "string",
-            "order": 8,
-            "title": "Ticket associations entities (comma separated)",
-            "default": "calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks, tickets",
-            "el_type": "extractor",
-            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4#deal-to-object",
-            "dependent": "extract_ticket_associations",
-            "description": "Comma separated list with the name of entities that should be extracted, e.g.: \"companies, contacts\".",
             "advanced_settings": true
           },
           "extract_contact_associations_comma_separated_string": {
@@ -169,26 +113,111 @@
             "description": "Comma separated list with the name of entities that should be extracted, e.g.: \"companies, contacts\".",
             "advanced_settings": true
           },
-          "extract_deal_property_history_comma_separated_string": {
-            "type": "string",
-            "order": 14,
-            "title": "Deal properties history (comma separated)",
-            "default": "dealstage",
+          "extract_ticket_associations": {
+            "type": "boolean",
+            "order": 7,
+            "title": "Extract ticket associations",
+            "default": false,
             "el_type": "extractor",
-            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/objects/deals#retrieve-deals",
-            "dependent": "extract_deal_property_history",
-            "description": "Comma separated list with the name of the properties that should be extracted, e.g.: \"dealstage, hs_lastmodifieddate\".",
+            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4",
+            "description": "Enable the extraction of entities associated with tickets. Enable only if necessary, since it significantly increases the extraction time.",
+            "advanced_settings": true
+          },
+          "extract_ticket_associations_comma_separated_string": {
+            "type": "string",
+            "order": 8,
+            "title": "Ticket associations entities (comma separated)",
+            "default": "calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks, tickets",
+            "el_type": "extractor",
+            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4#deal-to-object",
+            "dependent": "extract_ticket_associations",
+            "description": "Comma separated list with the name of entities that should be extracted, e.g.: \"companies, contacts\".",
+            "advanced_settings": true
+          },
+          "extract_lead_associations": {
+            "type": "boolean",
+            "order": 9,
+            "title": "Extract lead associations",
+            "default": false,
+            "el_type": "extractor",
+            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4",
+            "dependent": "enable_leads_stream",
+            "description": "Enable the extraction of entities associated with leads. Enable only if necessary, since it significantly increases the extraction time.",
+            "advanced_settings": true
+          },
+          "extract_lead_associations_comma_separated_string": {
+            "type": "string",
+            "order": 10,
+            "title": "Lead associations entities (comma separated)",
+            "default": "calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks, tickets",
+            "el_type": "extractor",
+            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4#deal-to-object",
+            "dependent": "extract_lead_associations",
+            "description": "Comma separated list with the name of entities that should be extracted, e.g.: \"companies, contacts\".",
+            "advanced_settings": true
+          },
+          "extract_company_associations": {
+            "type": "boolean",
+            "order": 11,
+            "title": "Extract company associations",
+            "default": false,
+            "el_type": "extractor",
+            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4",
+            "dependent": "enable_leads_stream",
+            "description": "Enable the extraction of entities associated with companies. Enable only if necessary, since it significantly increases the extraction time.",
+            "advanced_settings": true
+          },
+          "extract_company_associations_comma_separated_string": {
+            "type": "string",
+            "order": 12,
+            "title": "Company associations entities (comma separated)",
+            "default": "calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks, tickets",
+            "el_type": "extractor",
+            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4#deal-to-object",
+            "dependent": "extract_company_associations",
+            "description": "Comma separated list with the name of entities that should be extracted, e.g.: \"companies, contacts\".",
+            "advanced_settings": true
+          },
+          "extract_contact_property_history": {
+            "type": "boolean",
+            "order": 13,
+            "title": "Extract contact properties history",
+            "default": false,
+            "el_type": "extractor",
+            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/objects/contacts#retrieve-contacts-by-record-id%2C-email%2C-or-custom-unique-value-property",
+            "description": "Enable the extraction of properties history for contacts. Enable only if necessary, since it significantly increases the extraction time.",
             "advanced_settings": true
           },
           "extract_contact_property_history_comma_separated_string": {
             "type": "string",
-            "order": 12,
+            "order": 14,
             "title": "Contact properties history (comma separated)",
             "default": "lifecyclestage",
             "el_type": "extractor",
             "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/objects/contacts#retrieve-contacts-by-record-id%2C-email%2C-or-custom-unique-value-property",
             "dependent": "extract_contact_property_history",
             "description": "Comma separated list with the name of the properties that should be extracted, e.g.: \"lifecyclestage, hs_lastmodifieddate\".",
+            "advanced_settings": true
+          },
+          "extract_deal_property_history": {
+            "type": "boolean",
+            "order": 15,
+            "title": "Extract deal properties history",
+            "default": false,
+            "el_type": "extractor",
+            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/objects/deals#retrieve-deals",
+            "description": "Enable the extraction of properties history for deals. Enable only if necessary, since it significantly increases the extraction time.",
+            "advanced_settings": true
+          },
+          "extract_deal_property_history_comma_separated_string": {
+            "type": "string",
+            "order": 16,
+            "title": "Deal properties history (comma separated)",
+            "default": "dealstage",
+            "el_type": "extractor",
+            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/objects/deals#retrieve-deals",
+            "dependent": "extract_deal_property_history",
+            "description": "Comma separated list with the name of the properties that should be extracted, e.g.: \"dealstage, hs_lastmodifieddate\".",
             "advanced_settings": true
           }
         }
