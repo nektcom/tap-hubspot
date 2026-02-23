@@ -199,9 +199,6 @@ class TapHubspot(Tap):
         Returns:
             A list of discovered streams.
         """
-        return [
-            EmailStream(self),
-        ]
         streams_list = []
 
         custom_objects = self.get_custom_objects()
