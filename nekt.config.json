@@ -177,9 +177,30 @@
             "description": "Comma separated list with the name of entities that should be extracted, e.g.: \"companies, contacts\".",
             "advanced_settings": true
           },
-          "extract_contact_property_history": {
+          "extract_email_associations": {
             "type": "boolean",
             "order": 13,
+            "title": "Extract email associations",
+            "default": false,
+            "el_type": "extractor",
+            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4",
+            "description": "Enable the extraction of entities associated with emails. Enable only if necessary, since it significantly increases the extraction time.",
+            "advanced_settings": true
+          },
+          "extract_email_associations_comma_separated_string": {
+            "type": "string",
+            "order": 14,
+            "title": "Email associations entities (comma separated)",
+            "default": "companies, contacts, deals, tickets",
+            "el_type": "extractor",
+            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4#deal-to-object",
+            "dependent": "extract_email_associations",
+            "description": "Comma separated list with the name of entities that should be extracted, e.g.: \"companies, contacts\".",
+            "advanced_settings": true
+          },
+          "extract_contact_property_history": {
+            "type": "boolean",
+            "order": 15,
             "title": "Extract contact properties history",
             "default": false,
             "el_type": "extractor",
@@ -189,7 +210,7 @@
           },
           "extract_contact_property_history_comma_separated_string": {
             "type": "string",
-            "order": 14,
+            "order": 16,
             "title": "Contact properties history (comma separated)",
             "default": "lifecyclestage",
             "el_type": "extractor",
@@ -200,7 +221,7 @@
           },
           "extract_deal_property_history": {
             "type": "boolean",
-            "order": 15,
+            "order": 17,
             "title": "Extract deal properties history",
             "default": false,
             "el_type": "extractor",
@@ -210,7 +231,7 @@
           },
           "extract_deal_property_history_comma_separated_string": {
             "type": "string",
-            "order": 16,
+            "order": 18,
             "title": "Deal properties history (comma separated)",
             "default": "dealstage",
             "el_type": "extractor",

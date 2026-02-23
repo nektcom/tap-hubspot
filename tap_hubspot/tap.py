@@ -143,6 +143,20 @@ class TapHubspot(Tap):
             description="Comma separated string with the name of entities that should be extracted",
         ),
         th.Property(
+            "extract_email_associations",
+            th.BooleanType,
+            default=False,
+            required=True,
+            description="Enable the extraction of entities associated with emails",
+        ),
+        th.Property(
+            "extract_email_associations_comma_separated_string",
+            th.StringType,
+            required=False,
+            default="companies, contacts, deals, tickets",
+            description="Comma separated string with the name of entities that should be extracted",
+        ),
+        th.Property(
             "extract_contact_property_history",
             th.BooleanType,
             default=False,
@@ -185,6 +199,9 @@ class TapHubspot(Tap):
         Returns:
             A list of discovered streams.
         """
+        return [
+            EmailStream(self),
+        ]
         streams_list = []
 
         custom_objects = self.get_custom_objects()
