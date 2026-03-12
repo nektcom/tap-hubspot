@@ -138,14 +138,31 @@ class DynamicHubspotStream(HubspotStream):
         for name, type in self.hs_properties.items():
             hs_props.append(th.Property(name, self._get_datatype(type)))
         schema = th.PropertiesList(
-            th.Property("id", th.StringType),
+            th.Property(
+                "id",
+                th.StringType,
+                description="Unique identifier of the record.",
+            ),
             th.Property(
                 "properties",
                 th.ObjectType(*hs_props),
+                description="Object containing the record's custom properties.",
             ),
-            th.Property("createdAt", th.DateTimeType),
-            th.Property("updatedAt", th.DateTimeType),
-            th.Property("archived", th.BooleanType),
+            th.Property(
+                "createdAt",
+                th.DateTimeType,
+                description="Timestamp when the record was created.",
+            ),
+            th.Property(
+                "updatedAt",
+                th.DateTimeType,
+                description="Timestamp when the record was last updated.",
+            ),
+            th.Property(
+                "archived",
+                th.BooleanType,
+                description="Whether the record is archived.",
+            ),
         )
         return schema.to_dict()
 
@@ -202,20 +219,38 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
         for name, type in self.hs_properties.items():
             hs_props.append(th.Property(name, self._get_datatype(type)))
         schema = th.PropertiesList(
-            th.Property("id", th.StringType),
+            th.Property(
+                "id",
+                th.StringType,
+                description="Unique identifier of the record.",
+            ),
             th.Property(
                 "properties",
                 th.ObjectType(*hs_props),
+                description="Object containing the record's custom properties.",
             ),
-            th.Property("createdAt", th.DateTimeType),
-            th.Property("updatedAt", th.DateTimeType),
-            th.Property("archived", th.BooleanType),
+            th.Property(
+                "createdAt",
+                th.DateTimeType,
+                description="Timestamp when the record was created.",
+            ),
+            th.Property(
+                "updatedAt",
+                th.DateTimeType,
+                description="Timestamp when the record was last updated.",
+            ),
+            th.Property(
+                "archived",
+                th.BooleanType,
+                description="Whether the record is archived.",
+            ),
         )
         if self.replication_key:
             schema.append(
                 th.Property(
                     self.replication_key,
                     th.DateTimeType,
+                    description="Timestamp when the record was last updated.",
                 )
             )
         return schema.to_dict()

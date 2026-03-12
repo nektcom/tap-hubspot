@@ -24,23 +24,72 @@ class ProductStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = th.PropertiesList(
-        th.Property("id", th.StringType),
+        th.Property(
+            "id",
+            th.StringType,
+            description="Unique identifier of the record.",
+        ),
         th.Property(
             "properties",
             th.ObjectType(
-                th.Property("createdate", th.StringType),
-                th.Property("description", th.StringType),
-                th.Property("hs_cost_of_goods_sold", th.StringType),
-                th.Property("hs_lastmodifieddate", th.StringType),
-                th.Property("hs_recurring_billing_period", th.StringType),
-                th.Property("hs_sku", th.StringType),
-                th.Property("name", th.StringType),
-                th.Property("price", th.StringType),
+                th.Property(
+                    "createdate",
+                    th.StringType,
+                    description="Timestamp when the record was created.",
+                ),
+                th.Property(
+                    "description",
+                    th.StringType,
+                    description="Description of the product.",
+                ),
+                th.Property(
+                    "hs_cost_of_goods_sold",
+                    th.StringType,
+                    description="Cost of goods sold for the product.",
+                ),
+                th.Property(
+                    "hs_lastmodifieddate",
+                    th.StringType,
+                    description="Timestamp when the record was last updated.",
+                ),
+                th.Property(
+                    "hs_recurring_billing_period",
+                    th.StringType,
+                    description="Recurring billing period for the product.",
+                ),
+                th.Property(
+                    "hs_sku",
+                    th.StringType,
+                    description="Stock keeping unit identifier.",
+                ),
+                th.Property(
+                    "name",
+                    th.StringType,
+                    description="Name of the record.",
+                ),
+                th.Property(
+                    "price",
+                    th.StringType,
+                    description="Monetary value associated with the product.",
+                ),
             ),
+            description="Object containing the product's custom properties.",
         ),
-        th.Property("createdAt", th.StringType),
-        th.Property("updatedAt", th.StringType),
-        th.Property("archived", th.BooleanType),
+        th.Property(
+            "createdAt",
+            th.StringType,
+            description="Timestamp when the record was created.",
+        ),
+        th.Property(
+            "updatedAt",
+            th.StringType,
+            description="Timestamp when the record was last updated.",
+        ),
+        th.Property(
+            "archived",
+            th.BooleanType,
+            description="Whether the record is archived.",
+        ),
     ).to_dict()
 
     @property

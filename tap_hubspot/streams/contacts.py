@@ -54,10 +54,19 @@ class ContactStream(DynamicIncrementalHubspotStream):
                         association_string,
                         th.ArrayType(
                             th.ObjectType(
-                                th.Property("id", th.StringType),
-                                th.Property("type", th.StringType),
+                                th.Property(
+                                    "id",
+                                    th.StringType,
+                                    description="Unique identifier of the associated record.",
+                                ),
+                                th.Property(
+                                    "type",
+                                    th.StringType,
+                                    description="Type classification of the association.",
+                                ),
                             )
                         ),
+                        description="List of associated records.",
                     )
                 )
 
@@ -66,15 +75,41 @@ class ContactStream(DynamicIncrementalHubspotStream):
             property_history_schema = th.PropertiesList()
             property_history_properties = th.ArrayType(
                 th.ObjectType(
-                    th.Property("sourceType", th.StringType),
-                    th.Property("sourceId", th.StringType),
-                    th.Property("updatedByUserId", th.IntegerType),
-                    th.Property("value", th.StringType),
-                    th.Property("timestamp", th.StringType),
+                    th.Property(
+                        "sourceType",
+                        th.StringType,
+                        description="Type of the change source.",
+                    ),
+                    th.Property(
+                        "sourceId",
+                        th.StringType,
+                        description="Identifier of the change source.",
+                    ),
+                    th.Property(
+                        "updatedByUserId",
+                        th.IntegerType,
+                        description="Identifier of the user who made the change.",
+                    ),
+                    th.Property(
+                        "value",
+                        th.StringType,
+                        description="Value of the property at this change.",
+                    ),
+                    th.Property(
+                        "timestamp",
+                        th.StringType,
+                        description="Timestamp when the change occurred.",
+                    ),
                 )
             )
             for property_name in self.property_history_string_list:
-                property_history_schema.append(th.Property(property_name, property_history_properties))
+                property_history_schema.append(
+                    th.Property(
+                        property_name,
+                        property_history_properties,
+                        description="History of changes for this property.",
+                    )
+                )
             schema["properties"]["propertiesWithHistory"] = property_history_schema.to_dict()
         return schema
 

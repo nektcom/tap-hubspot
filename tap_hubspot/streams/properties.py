@@ -37,43 +37,145 @@ class PropertyTicketStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = PropertiesList(
-        Property("updatedAt", StringType),
-        Property("createdAt", StringType),
-        Property("name", StringType),
-        Property("label", StringType),
-        Property("type", StringType),
-        Property("fieldType", StringType),
-        Property("description", StringType),
-        Property("groupName", StringType),
+        Property(
+            "updatedAt",
+            StringType,
+            description="Timestamp when the record was last updated.",
+        ),
+        Property(
+            "createdAt",
+            StringType,
+            description="Timestamp when the record was created.",
+        ),
+        Property(
+            "name",
+            StringType,
+            description="Internal name of the property.",
+        ),
+        Property(
+            "label",
+            StringType,
+            description="Display label of the property.",
+        ),
+        Property(
+            "type",
+            StringType,
+            description="Type classification of the record.",
+        ),
+        Property(
+            "fieldType",
+            StringType,
+            description="Field type used in forms and UI.",
+        ),
+        Property(
+            "description",
+            StringType,
+            description="Description of the property.",
+        ),
+        Property(
+            "groupName",
+            StringType,
+            description="Name of the property group.",
+        ),
         Property(
             "options",
             ArrayType(
                 ObjectType(
-                    Property("label", StringType),
-                    Property("description", StringType),
-                    Property("value", StringType),
-                    Property("displayOrder", IntegerType),
-                    Property("hidden", BooleanType),
+                    Property(
+                        "label",
+                        StringType,
+                        description="Display label for the option.",
+                    ),
+                    Property(
+                        "description",
+                        StringType,
+                        description="Description of the option.",
+                    ),
+                    Property(
+                        "value",
+                        StringType,
+                        description="Value of the option.",
+                    ),
+                    Property(
+                        "displayOrder",
+                        IntegerType,
+                        description="Order in which the option is displayed.",
+                    ),
+                    Property(
+                        "hidden",
+                        BooleanType,
+                        description="Whether the option is hidden.",
+                    ),
                 ),
             ),
+            description="List of options for the property.",
         ),
-        Property("displayOrder", IntegerType),
-        Property("calculated", BooleanType),
-        Property("externalOptions", BooleanType),
-        Property("hasUniqueValue", BooleanType),
-        Property("hidden", BooleanType),
-        Property("hubspotDefined", BooleanType),
+        Property(
+            "displayOrder",
+            IntegerType,
+            description="Order in which the property is displayed.",
+        ),
+        Property(
+            "calculated",
+            BooleanType,
+            description="Whether the property is calculated.",
+        ),
+        Property(
+            "externalOptions",
+            BooleanType,
+            description="Whether the property uses external options.",
+        ),
+        Property(
+            "hasUniqueValue",
+            BooleanType,
+            description="Whether the property must have a unique value.",
+        ),
+        Property(
+            "hidden",
+            BooleanType,
+            description="Whether the property is hidden.",
+        ),
+        Property(
+            "hubspotDefined",
+            BooleanType,
+            description="Whether the property is defined by HubSpot.",
+        ),
         Property(
             "modificationMetadata",
             ObjectType(
-                Property("readOnlyOptions", BooleanType),
-                Property("readOnlyValue", BooleanType),
-                Property("readOnlyDefinition", BooleanType),
-                Property("archivable", BooleanType),
+                Property(
+                    "readOnlyOptions",
+                    BooleanType,
+                    description="Whether options are read-only.",
+                ),
+                Property(
+                    "readOnlyValue",
+                    BooleanType,
+                    description="Whether the value is read-only.",
+                ),
+                Property(
+                    "readOnlyDefinition",
+                    BooleanType,
+                    description="Whether the definition is read-only.",
+                ),
+                Property(
+                    "archivable",
+                    BooleanType,
+                    description="Whether the property can be archived.",
+                ),
             ),
+            description="Metadata about property modification permissions.",
         ),
-        Property("formField", BooleanType),
-        Property("hubspot_object", StringType),
+        Property(
+            "formField",
+            BooleanType,
+            description="Whether the property is used in forms.",
+        ),
+        Property(
+            "hubspot_object",
+            StringType,
+            description="HubSpot object type the property belongs to.",
+        ),
     ).to_dict()
 
     @property
@@ -104,44 +206,150 @@ class PropertyDealStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = PropertiesList(
-        Property("updatedAt", StringType),
-        Property("createdAt", StringType),
-        Property("name", StringType),
-        Property("label", StringType),
-        Property("type", StringType),
-        Property("fieldType", StringType),
-        Property("description", StringType),
-        Property("groupName", StringType),
+        Property(
+            "updatedAt",
+            StringType,
+            description="Timestamp when the record was last updated.",
+        ),
+        Property(
+            "createdAt",
+            StringType,
+            description="Timestamp when the record was created.",
+        ),
+        Property(
+            "name",
+            StringType,
+            description="Internal name of the property.",
+        ),
+        Property(
+            "label",
+            StringType,
+            description="Display label of the property.",
+        ),
+        Property(
+            "type",
+            StringType,
+            description="Type classification of the record.",
+        ),
+        Property(
+            "fieldType",
+            StringType,
+            description="Field type used in forms and UI.",
+        ),
+        Property(
+            "description",
+            StringType,
+            description="Description of the property.",
+        ),
+        Property(
+            "groupName",
+            StringType,
+            description="Name of the property group.",
+        ),
         Property(
             "options",
             ArrayType(
                 ObjectType(
-                    Property("label", StringType),
-                    Property("description", StringType),
-                    Property("value", StringType),
-                    Property("displayOrder", IntegerType),
-                    Property("hidden", BooleanType),
+                    Property(
+                        "label",
+                        StringType,
+                        description="Display label for the option.",
+                    ),
+                    Property(
+                        "description",
+                        StringType,
+                        description="Description of the option.",
+                    ),
+                    Property(
+                        "value",
+                        StringType,
+                        description="Value of the option.",
+                    ),
+                    Property(
+                        "displayOrder",
+                        IntegerType,
+                        description="Order in which the option is displayed.",
+                    ),
+                    Property(
+                        "hidden",
+                        BooleanType,
+                        description="Whether the option is hidden.",
+                    ),
                 ),
             ),
+            description="List of options for the property.",
         ),
-        Property("displayOrder", IntegerType),
-        Property("calculated", BooleanType),
-        Property("externalOptions", BooleanType),
-        Property("hasUniqueValue", BooleanType),
-        Property("hidden", BooleanType),
-        Property("hubspotDefined", BooleanType),
+        Property(
+            "displayOrder",
+            IntegerType,
+            description="Order in which the property is displayed.",
+        ),
+        Property(
+            "calculated",
+            BooleanType,
+            description="Whether the property is calculated.",
+        ),
+        Property(
+            "externalOptions",
+            BooleanType,
+            description="Whether the property uses external options.",
+        ),
+        Property(
+            "hasUniqueValue",
+            BooleanType,
+            description="Whether the property must have a unique value.",
+        ),
+        Property(
+            "hidden",
+            BooleanType,
+            description="Whether the property is hidden.",
+        ),
+        Property(
+            "hubspotDefined",
+            BooleanType,
+            description="Whether the property is defined by HubSpot.",
+        ),
         Property(
             "modificationMetadata",
             ObjectType(
-                Property("readOnlyOptions", BooleanType),
-                Property("readOnlyValue", BooleanType),
-                Property("readOnlyDefinition", BooleanType),
-                Property("archivable", BooleanType),
+                Property(
+                    "readOnlyOptions",
+                    BooleanType,
+                    description="Whether options are read-only.",
+                ),
+                Property(
+                    "readOnlyValue",
+                    BooleanType,
+                    description="Whether the value is read-only.",
+                ),
+                Property(
+                    "readOnlyDefinition",
+                    BooleanType,
+                    description="Whether the definition is read-only.",
+                ),
+                Property(
+                    "archivable",
+                    BooleanType,
+                    description="Whether the property can be archived.",
+                ),
             ),
+            description="Metadata about property modification permissions.",
         ),
-        Property("formField", BooleanType),
-        Property("hubspot_object", StringType),
-        Property("calculationFormula", StringType),
+        Property(
+            "formField",
+            BooleanType,
+            description="Whether the property is used in forms.",
+        ),
+        Property(
+            "hubspot_object",
+            StringType,
+            description="HubSpot object type the property belongs to.",
+        ),
+        Property(
+            "calculationFormula",
+            StringType,
+            description="Formula used for calculated properties.",
+        ),
     ).to_dict()
 
     @property
@@ -172,43 +380,145 @@ class PropertyContactStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = PropertiesList(
-        Property("updatedAt", StringType),
-        Property("createdAt", StringType),
-        Property("name", StringType),
-        Property("label", StringType),
-        Property("type", StringType),
-        Property("fieldType", StringType),
-        Property("description", StringType),
-        Property("groupName", StringType),
+        Property(
+            "updatedAt",
+            StringType,
+            description="Timestamp when the record was last updated.",
+        ),
+        Property(
+            "createdAt",
+            StringType,
+            description="Timestamp when the record was created.",
+        ),
+        Property(
+            "name",
+            StringType,
+            description="Internal name of the property.",
+        ),
+        Property(
+            "label",
+            StringType,
+            description="Display label of the property.",
+        ),
+        Property(
+            "type",
+            StringType,
+            description="Type classification of the record.",
+        ),
+        Property(
+            "fieldType",
+            StringType,
+            description="Field type used in forms and UI.",
+        ),
+        Property(
+            "description",
+            StringType,
+            description="Description of the property.",
+        ),
+        Property(
+            "groupName",
+            StringType,
+            description="Name of the property group.",
+        ),
         Property(
             "options",
             ArrayType(
                 ObjectType(
-                    Property("label", StringType),
-                    Property("description", StringType),
-                    Property("value", StringType),
-                    Property("displayOrder", IntegerType),
-                    Property("hidden", BooleanType),
+                    Property(
+                        "label",
+                        StringType,
+                        description="Display label for the option.",
+                    ),
+                    Property(
+                        "description",
+                        StringType,
+                        description="Description of the option.",
+                    ),
+                    Property(
+                        "value",
+                        StringType,
+                        description="Value of the option.",
+                    ),
+                    Property(
+                        "displayOrder",
+                        IntegerType,
+                        description="Order in which the option is displayed.",
+                    ),
+                    Property(
+                        "hidden",
+                        BooleanType,
+                        description="Whether the option is hidden.",
+                    ),
                 ),
             ),
+            description="List of options for the property.",
         ),
-        Property("displayOrder", IntegerType),
-        Property("calculated", BooleanType),
-        Property("externalOptions", BooleanType),
-        Property("hasUniqueValue", BooleanType),
-        Property("hidden", BooleanType),
-        Property("hubspotDefined", BooleanType),
+        Property(
+            "displayOrder",
+            IntegerType,
+            description="Order in which the property is displayed.",
+        ),
+        Property(
+            "calculated",
+            BooleanType,
+            description="Whether the property is calculated.",
+        ),
+        Property(
+            "externalOptions",
+            BooleanType,
+            description="Whether the property uses external options.",
+        ),
+        Property(
+            "hasUniqueValue",
+            BooleanType,
+            description="Whether the property must have a unique value.",
+        ),
+        Property(
+            "hidden",
+            BooleanType,
+            description="Whether the property is hidden.",
+        ),
+        Property(
+            "hubspotDefined",
+            BooleanType,
+            description="Whether the property is defined by HubSpot.",
+        ),
         Property(
             "modificationMetadata",
             ObjectType(
-                Property("readOnlyOptions", BooleanType),
-                Property("readOnlyValue", BooleanType),
-                Property("readOnlyDefinition", BooleanType),
-                Property("archivable", BooleanType),
+                Property(
+                    "readOnlyOptions",
+                    BooleanType,
+                    description="Whether options are read-only.",
+                ),
+                Property(
+                    "readOnlyValue",
+                    BooleanType,
+                    description="Whether the value is read-only.",
+                ),
+                Property(
+                    "readOnlyDefinition",
+                    BooleanType,
+                    description="Whether the definition is read-only.",
+                ),
+                Property(
+                    "archivable",
+                    BooleanType,
+                    description="Whether the property can be archived.",
+                ),
             ),
+            description="Metadata about property modification permissions.",
         ),
-        Property("formField", BooleanType),
-        Property("hubspot_object", StringType),
+        Property(
+            "formField",
+            BooleanType,
+            description="Whether the property is used in forms.",
+        ),
+        Property(
+            "hubspot_object",
+            StringType,
+            description="HubSpot object type the property belongs to.",
+        ),
     ).to_dict()
 
     @property
@@ -239,43 +549,145 @@ class PropertyCompanyStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = PropertiesList(
-        Property("updatedAt", StringType),
-        Property("createdAt", StringType),
-        Property("name", StringType),
-        Property("label", StringType),
-        Property("type", StringType),
-        Property("fieldType", StringType),
-        Property("description", StringType),
-        Property("groupName", StringType),
+        Property(
+            "updatedAt",
+            StringType,
+            description="Timestamp when the record was last updated.",
+        ),
+        Property(
+            "createdAt",
+            StringType,
+            description="Timestamp when the record was created.",
+        ),
+        Property(
+            "name",
+            StringType,
+            description="Internal name of the property.",
+        ),
+        Property(
+            "label",
+            StringType,
+            description="Display label of the property.",
+        ),
+        Property(
+            "type",
+            StringType,
+            description="Type classification of the record.",
+        ),
+        Property(
+            "fieldType",
+            StringType,
+            description="Field type used in forms and UI.",
+        ),
+        Property(
+            "description",
+            StringType,
+            description="Description of the property.",
+        ),
+        Property(
+            "groupName",
+            StringType,
+            description="Name of the property group.",
+        ),
         Property(
             "options",
             ArrayType(
                 ObjectType(
-                    Property("label", StringType),
-                    Property("description", StringType),
-                    Property("value", StringType),
-                    Property("displayOrder", IntegerType),
-                    Property("hidden", BooleanType),
+                    Property(
+                        "label",
+                        StringType,
+                        description="Display label for the option.",
+                    ),
+                    Property(
+                        "description",
+                        StringType,
+                        description="Description of the option.",
+                    ),
+                    Property(
+                        "value",
+                        StringType,
+                        description="Value of the option.",
+                    ),
+                    Property(
+                        "displayOrder",
+                        IntegerType,
+                        description="Order in which the option is displayed.",
+                    ),
+                    Property(
+                        "hidden",
+                        BooleanType,
+                        description="Whether the option is hidden.",
+                    ),
                 ),
             ),
+            description="List of options for the property.",
         ),
-        Property("displayOrder", IntegerType),
-        Property("calculated", BooleanType),
-        Property("externalOptions", BooleanType),
-        Property("hasUniqueValue", BooleanType),
-        Property("hidden", BooleanType),
-        Property("hubspotDefined", BooleanType),
+        Property(
+            "displayOrder",
+            IntegerType,
+            description="Order in which the property is displayed.",
+        ),
+        Property(
+            "calculated",
+            BooleanType,
+            description="Whether the property is calculated.",
+        ),
+        Property(
+            "externalOptions",
+            BooleanType,
+            description="Whether the property uses external options.",
+        ),
+        Property(
+            "hasUniqueValue",
+            BooleanType,
+            description="Whether the property must have a unique value.",
+        ),
+        Property(
+            "hidden",
+            BooleanType,
+            description="Whether the property is hidden.",
+        ),
+        Property(
+            "hubspotDefined",
+            BooleanType,
+            description="Whether the property is defined by HubSpot.",
+        ),
         Property(
             "modificationMetadata",
             ObjectType(
-                Property("readOnlyOptions", BooleanType),
-                Property("readOnlyValue", BooleanType),
-                Property("readOnlyDefinition", BooleanType),
-                Property("archivable", BooleanType),
+                Property(
+                    "readOnlyOptions",
+                    BooleanType,
+                    description="Whether options are read-only.",
+                ),
+                Property(
+                    "readOnlyValue",
+                    BooleanType,
+                    description="Whether the value is read-only.",
+                ),
+                Property(
+                    "readOnlyDefinition",
+                    BooleanType,
+                    description="Whether the definition is read-only.",
+                ),
+                Property(
+                    "archivable",
+                    BooleanType,
+                    description="Whether the property can be archived.",
+                ),
             ),
+            description="Metadata about property modification permissions.",
         ),
-        Property("formField", BooleanType),
-        Property("hubspot_object", StringType),
+        Property(
+            "formField",
+            BooleanType,
+            description="Whether the property is used in forms.",
+        ),
+        Property(
+            "hubspot_object",
+            StringType,
+            description="HubSpot object type the property belongs to.",
+        ),
     ).to_dict()
 
     @property
@@ -306,43 +718,145 @@ class PropertyProductStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = PropertiesList(
-        Property("updatedAt", StringType),
-        Property("createdAt", StringType),
-        Property("name", StringType),
-        Property("label", StringType),
-        Property("type", StringType),
-        Property("fieldType", StringType),
-        Property("description", StringType),
-        Property("groupName", StringType),
+        Property(
+            "updatedAt",
+            StringType,
+            description="Timestamp when the record was last updated.",
+        ),
+        Property(
+            "createdAt",
+            StringType,
+            description="Timestamp when the record was created.",
+        ),
+        Property(
+            "name",
+            StringType,
+            description="Internal name of the property.",
+        ),
+        Property(
+            "label",
+            StringType,
+            description="Display label of the property.",
+        ),
+        Property(
+            "type",
+            StringType,
+            description="Type classification of the record.",
+        ),
+        Property(
+            "fieldType",
+            StringType,
+            description="Field type used in forms and UI.",
+        ),
+        Property(
+            "description",
+            StringType,
+            description="Description of the property.",
+        ),
+        Property(
+            "groupName",
+            StringType,
+            description="Name of the property group.",
+        ),
         Property(
             "options",
             ArrayType(
                 ObjectType(
-                    Property("label", StringType),
-                    Property("description", StringType),
-                    Property("value", StringType),
-                    Property("displayOrder", IntegerType),
-                    Property("hidden", BooleanType),
+                    Property(
+                        "label",
+                        StringType,
+                        description="Display label for the option.",
+                    ),
+                    Property(
+                        "description",
+                        StringType,
+                        description="Description of the option.",
+                    ),
+                    Property(
+                        "value",
+                        StringType,
+                        description="Value of the option.",
+                    ),
+                    Property(
+                        "displayOrder",
+                        IntegerType,
+                        description="Order in which the option is displayed.",
+                    ),
+                    Property(
+                        "hidden",
+                        BooleanType,
+                        description="Whether the option is hidden.",
+                    ),
                 ),
             ),
+            description="List of options for the property.",
         ),
-        Property("displayOrder", IntegerType),
-        Property("calculated", BooleanType),
-        Property("externalOptions", BooleanType),
-        Property("hasUniqueValue", BooleanType),
-        Property("hidden", BooleanType),
-        Property("hubspotDefined", BooleanType),
+        Property(
+            "displayOrder",
+            IntegerType,
+            description="Order in which the property is displayed.",
+        ),
+        Property(
+            "calculated",
+            BooleanType,
+            description="Whether the property is calculated.",
+        ),
+        Property(
+            "externalOptions",
+            BooleanType,
+            description="Whether the property uses external options.",
+        ),
+        Property(
+            "hasUniqueValue",
+            BooleanType,
+            description="Whether the property must have a unique value.",
+        ),
+        Property(
+            "hidden",
+            BooleanType,
+            description="Whether the property is hidden.",
+        ),
+        Property(
+            "hubspotDefined",
+            BooleanType,
+            description="Whether the property is defined by HubSpot.",
+        ),
         Property(
             "modificationMetadata",
             ObjectType(
-                Property("readOnlyOptions", BooleanType),
-                Property("readOnlyValue", BooleanType),
-                Property("readOnlyDefinition", BooleanType),
-                Property("archivable", BooleanType),
+                Property(
+                    "readOnlyOptions",
+                    BooleanType,
+                    description="Whether options are read-only.",
+                ),
+                Property(
+                    "readOnlyValue",
+                    BooleanType,
+                    description="Whether the value is read-only.",
+                ),
+                Property(
+                    "readOnlyDefinition",
+                    BooleanType,
+                    description="Whether the definition is read-only.",
+                ),
+                Property(
+                    "archivable",
+                    BooleanType,
+                    description="Whether the property can be archived.",
+                ),
             ),
+            description="Metadata about property modification permissions.",
         ),
-        Property("formField", BooleanType),
-        Property("hubspot_object", StringType),
+        Property(
+            "formField",
+            BooleanType,
+            description="Whether the property is used in forms.",
+        ),
+        Property(
+            "hubspot_object",
+            StringType,
+            description="HubSpot object type the property belongs to.",
+        ),
     ).to_dict()
 
     @property
@@ -373,43 +887,145 @@ class PropertyLineItemStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = PropertiesList(
-        Property("updatedAt", StringType),
-        Property("createdAt", StringType),
-        Property("name", StringType),
-        Property("label", StringType),
-        Property("type", StringType),
-        Property("fieldType", StringType),
-        Property("description", StringType),
-        Property("groupName", StringType),
+        Property(
+            "updatedAt",
+            StringType,
+            description="Timestamp when the record was last updated.",
+        ),
+        Property(
+            "createdAt",
+            StringType,
+            description="Timestamp when the record was created.",
+        ),
+        Property(
+            "name",
+            StringType,
+            description="Internal name of the property.",
+        ),
+        Property(
+            "label",
+            StringType,
+            description="Display label of the property.",
+        ),
+        Property(
+            "type",
+            StringType,
+            description="Type classification of the record.",
+        ),
+        Property(
+            "fieldType",
+            StringType,
+            description="Field type used in forms and UI.",
+        ),
+        Property(
+            "description",
+            StringType,
+            description="Description of the property.",
+        ),
+        Property(
+            "groupName",
+            StringType,
+            description="Name of the property group.",
+        ),
         Property(
             "options",
             ArrayType(
                 ObjectType(
-                    Property("label", StringType),
-                    Property("description", StringType),
-                    Property("value", StringType),
-                    Property("displayOrder", IntegerType),
-                    Property("hidden", BooleanType),
+                    Property(
+                        "label",
+                        StringType,
+                        description="Display label for the option.",
+                    ),
+                    Property(
+                        "description",
+                        StringType,
+                        description="Description of the option.",
+                    ),
+                    Property(
+                        "value",
+                        StringType,
+                        description="Value of the option.",
+                    ),
+                    Property(
+                        "displayOrder",
+                        IntegerType,
+                        description="Order in which the option is displayed.",
+                    ),
+                    Property(
+                        "hidden",
+                        BooleanType,
+                        description="Whether the option is hidden.",
+                    ),
                 ),
             ),
+            description="List of options for the property.",
         ),
-        Property("displayOrder", IntegerType),
-        Property("calculated", BooleanType),
-        Property("externalOptions", BooleanType),
-        Property("hasUniqueValue", BooleanType),
-        Property("hidden", BooleanType),
-        Property("hubspotDefined", BooleanType),
+        Property(
+            "displayOrder",
+            IntegerType,
+            description="Order in which the property is displayed.",
+        ),
+        Property(
+            "calculated",
+            BooleanType,
+            description="Whether the property is calculated.",
+        ),
+        Property(
+            "externalOptions",
+            BooleanType,
+            description="Whether the property uses external options.",
+        ),
+        Property(
+            "hasUniqueValue",
+            BooleanType,
+            description="Whether the property must have a unique value.",
+        ),
+        Property(
+            "hidden",
+            BooleanType,
+            description="Whether the property is hidden.",
+        ),
+        Property(
+            "hubspotDefined",
+            BooleanType,
+            description="Whether the property is defined by HubSpot.",
+        ),
         Property(
             "modificationMetadata",
             ObjectType(
-                Property("readOnlyOptions", BooleanType),
-                Property("readOnlyValue", BooleanType),
-                Property("readOnlyDefinition", BooleanType),
-                Property("archivable", BooleanType),
+                Property(
+                    "readOnlyOptions",
+                    BooleanType,
+                    description="Whether options are read-only.",
+                ),
+                Property(
+                    "readOnlyValue",
+                    BooleanType,
+                    description="Whether the value is read-only.",
+                ),
+                Property(
+                    "readOnlyDefinition",
+                    BooleanType,
+                    description="Whether the definition is read-only.",
+                ),
+                Property(
+                    "archivable",
+                    BooleanType,
+                    description="Whether the property can be archived.",
+                ),
             ),
+            description="Metadata about property modification permissions.",
         ),
-        Property("formField", BooleanType),
-        Property("hubspot_object", StringType),
+        Property(
+            "formField",
+            BooleanType,
+            description="Whether the property is used in forms.",
+        ),
+        Property(
+            "hubspot_object",
+            StringType,
+            description="HubSpot object type the property belongs to.",
+        ),
     ).to_dict()
 
     @property
@@ -440,43 +1056,145 @@ class PropertyEmailStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = PropertiesList(
-        Property("updatedAt", StringType),
-        Property("createdAt", StringType),
-        Property("name", StringType),
-        Property("label", StringType),
-        Property("type", StringType),
-        Property("fieldType", StringType),
-        Property("description", StringType),
-        Property("groupName", StringType),
+        Property(
+            "updatedAt",
+            StringType,
+            description="Timestamp when the record was last updated.",
+        ),
+        Property(
+            "createdAt",
+            StringType,
+            description="Timestamp when the record was created.",
+        ),
+        Property(
+            "name",
+            StringType,
+            description="Internal name of the property.",
+        ),
+        Property(
+            "label",
+            StringType,
+            description="Display label of the property.",
+        ),
+        Property(
+            "type",
+            StringType,
+            description="Type classification of the record.",
+        ),
+        Property(
+            "fieldType",
+            StringType,
+            description="Field type used in forms and UI.",
+        ),
+        Property(
+            "description",
+            StringType,
+            description="Description of the property.",
+        ),
+        Property(
+            "groupName",
+            StringType,
+            description="Name of the property group.",
+        ),
         Property(
             "options",
             ArrayType(
                 ObjectType(
-                    Property("label", StringType),
-                    Property("description", StringType),
-                    Property("value", StringType),
-                    Property("displayOrder", IntegerType),
-                    Property("hidden", BooleanType),
+                    Property(
+                        "label",
+                        StringType,
+                        description="Display label for the option.",
+                    ),
+                    Property(
+                        "description",
+                        StringType,
+                        description="Description of the option.",
+                    ),
+                    Property(
+                        "value",
+                        StringType,
+                        description="Value of the option.",
+                    ),
+                    Property(
+                        "displayOrder",
+                        IntegerType,
+                        description="Order in which the option is displayed.",
+                    ),
+                    Property(
+                        "hidden",
+                        BooleanType,
+                        description="Whether the option is hidden.",
+                    ),
                 ),
             ),
+            description="List of options for the property.",
         ),
-        Property("displayOrder", IntegerType),
-        Property("calculated", BooleanType),
-        Property("externalOptions", BooleanType),
-        Property("hasUniqueValue", BooleanType),
-        Property("hidden", BooleanType),
-        Property("hubspotDefined", BooleanType),
+        Property(
+            "displayOrder",
+            IntegerType,
+            description="Order in which the property is displayed.",
+        ),
+        Property(
+            "calculated",
+            BooleanType,
+            description="Whether the property is calculated.",
+        ),
+        Property(
+            "externalOptions",
+            BooleanType,
+            description="Whether the property uses external options.",
+        ),
+        Property(
+            "hasUniqueValue",
+            BooleanType,
+            description="Whether the property must have a unique value.",
+        ),
+        Property(
+            "hidden",
+            BooleanType,
+            description="Whether the property is hidden.",
+        ),
+        Property(
+            "hubspotDefined",
+            BooleanType,
+            description="Whether the property is defined by HubSpot.",
+        ),
         Property(
             "modificationMetadata",
             ObjectType(
-                Property("readOnlyOptions", BooleanType),
-                Property("readOnlyValue", BooleanType),
-                Property("readOnlyDefinition", BooleanType),
-                Property("archivable", BooleanType),
+                Property(
+                    "readOnlyOptions",
+                    BooleanType,
+                    description="Whether options are read-only.",
+                ),
+                Property(
+                    "readOnlyValue",
+                    BooleanType,
+                    description="Whether the value is read-only.",
+                ),
+                Property(
+                    "readOnlyDefinition",
+                    BooleanType,
+                    description="Whether the definition is read-only.",
+                ),
+                Property(
+                    "archivable",
+                    BooleanType,
+                    description="Whether the property can be archived.",
+                ),
             ),
+            description="Metadata about property modification permissions.",
         ),
-        Property("formField", BooleanType),
-        Property("hubspot_object", StringType),
+        Property(
+            "formField",
+            BooleanType,
+            description="Whether the property is used in forms.",
+        ),
+        Property(
+            "hubspot_object",
+            StringType,
+            description="HubSpot object type the property belongs to.",
+        ),
     ).to_dict()
 
     @property
@@ -507,43 +1225,145 @@ class PropertyPostalMailStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = PropertiesList(
-        Property("updatedAt", StringType),
-        Property("createdAt", StringType),
-        Property("name", StringType),
-        Property("label", StringType),
-        Property("type", StringType),
-        Property("fieldType", StringType),
-        Property("description", StringType),
-        Property("groupName", StringType),
+        Property(
+            "updatedAt",
+            StringType,
+            description="Timestamp when the record was last updated.",
+        ),
+        Property(
+            "createdAt",
+            StringType,
+            description="Timestamp when the record was created.",
+        ),
+        Property(
+            "name",
+            StringType,
+            description="Internal name of the property.",
+        ),
+        Property(
+            "label",
+            StringType,
+            description="Display label of the property.",
+        ),
+        Property(
+            "type",
+            StringType,
+            description="Type classification of the record.",
+        ),
+        Property(
+            "fieldType",
+            StringType,
+            description="Field type used in forms and UI.",
+        ),
+        Property(
+            "description",
+            StringType,
+            description="Description of the property.",
+        ),
+        Property(
+            "groupName",
+            StringType,
+            description="Name of the property group.",
+        ),
         Property(
             "options",
             ArrayType(
                 ObjectType(
-                    Property("label", StringType),
-                    Property("description", StringType),
-                    Property("value", StringType),
-                    Property("displayOrder", IntegerType),
-                    Property("hidden", BooleanType),
+                    Property(
+                        "label",
+                        StringType,
+                        description="Display label for the option.",
+                    ),
+                    Property(
+                        "description",
+                        StringType,
+                        description="Description of the option.",
+                    ),
+                    Property(
+                        "value",
+                        StringType,
+                        description="Value of the option.",
+                    ),
+                    Property(
+                        "displayOrder",
+                        IntegerType,
+                        description="Order in which the option is displayed.",
+                    ),
+                    Property(
+                        "hidden",
+                        BooleanType,
+                        description="Whether the option is hidden.",
+                    ),
                 ),
             ),
+            description="List of options for the property.",
         ),
-        Property("displayOrder", IntegerType),
-        Property("calculated", BooleanType),
-        Property("externalOptions", BooleanType),
-        Property("hasUniqueValue", BooleanType),
-        Property("hidden", BooleanType),
-        Property("hubspotDefined", BooleanType),
+        Property(
+            "displayOrder",
+            IntegerType,
+            description="Order in which the property is displayed.",
+        ),
+        Property(
+            "calculated",
+            BooleanType,
+            description="Whether the property is calculated.",
+        ),
+        Property(
+            "externalOptions",
+            BooleanType,
+            description="Whether the property uses external options.",
+        ),
+        Property(
+            "hasUniqueValue",
+            BooleanType,
+            description="Whether the property must have a unique value.",
+        ),
+        Property(
+            "hidden",
+            BooleanType,
+            description="Whether the property is hidden.",
+        ),
+        Property(
+            "hubspotDefined",
+            BooleanType,
+            description="Whether the property is defined by HubSpot.",
+        ),
         Property(
             "modificationMetadata",
             ObjectType(
-                Property("readOnlyOptions", BooleanType),
-                Property("readOnlyValue", BooleanType),
-                Property("readOnlyDefinition", BooleanType),
-                Property("archivable", BooleanType),
+                Property(
+                    "readOnlyOptions",
+                    BooleanType,
+                    description="Whether options are read-only.",
+                ),
+                Property(
+                    "readOnlyValue",
+                    BooleanType,
+                    description="Whether the value is read-only.",
+                ),
+                Property(
+                    "readOnlyDefinition",
+                    BooleanType,
+                    description="Whether the definition is read-only.",
+                ),
+                Property(
+                    "archivable",
+                    BooleanType,
+                    description="Whether the property can be archived.",
+                ),
             ),
+            description="Metadata about property modification permissions.",
         ),
-        Property("formField", BooleanType),
-        Property("hubspot_object", StringType),
+        Property(
+            "formField",
+            BooleanType,
+            description="Whether the property is used in forms.",
+        ),
+        Property(
+            "hubspot_object",
+            StringType,
+            description="HubSpot object type the property belongs to.",
+        ),
     ).to_dict()
 
     @property
@@ -574,43 +1394,145 @@ class PropertyCallStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = PropertiesList(
-        Property("updatedAt", StringType),
-        Property("createdAt", StringType),
-        Property("name", StringType),
-        Property("label", StringType),
-        Property("type", StringType),
-        Property("fieldType", StringType),
-        Property("description", StringType),
-        Property("groupName", StringType),
+        Property(
+            "updatedAt",
+            StringType,
+            description="Timestamp when the record was last updated.",
+        ),
+        Property(
+            "createdAt",
+            StringType,
+            description="Timestamp when the record was created.",
+        ),
+        Property(
+            "name",
+            StringType,
+            description="Internal name of the property.",
+        ),
+        Property(
+            "label",
+            StringType,
+            description="Display label of the property.",
+        ),
+        Property(
+            "type",
+            StringType,
+            description="Type classification of the record.",
+        ),
+        Property(
+            "fieldType",
+            StringType,
+            description="Field type used in forms and UI.",
+        ),
+        Property(
+            "description",
+            StringType,
+            description="Description of the property.",
+        ),
+        Property(
+            "groupName",
+            StringType,
+            description="Name of the property group.",
+        ),
         Property(
             "options",
             ArrayType(
                 ObjectType(
-                    Property("label", StringType),
-                    Property("description", StringType),
-                    Property("value", StringType),
-                    Property("displayOrder", IntegerType),
-                    Property("hidden", BooleanType),
+                    Property(
+                        "label",
+                        StringType,
+                        description="Display label for the option.",
+                    ),
+                    Property(
+                        "description",
+                        StringType,
+                        description="Description of the option.",
+                    ),
+                    Property(
+                        "value",
+                        StringType,
+                        description="Value of the option.",
+                    ),
+                    Property(
+                        "displayOrder",
+                        IntegerType,
+                        description="Order in which the option is displayed.",
+                    ),
+                    Property(
+                        "hidden",
+                        BooleanType,
+                        description="Whether the option is hidden.",
+                    ),
                 ),
             ),
+            description="List of options for the property.",
         ),
-        Property("displayOrder", IntegerType),
-        Property("calculated", BooleanType),
-        Property("externalOptions", BooleanType),
-        Property("hasUniqueValue", BooleanType),
-        Property("hidden", BooleanType),
-        Property("hubspotDefined", BooleanType),
+        Property(
+            "displayOrder",
+            IntegerType,
+            description="Order in which the property is displayed.",
+        ),
+        Property(
+            "calculated",
+            BooleanType,
+            description="Whether the property is calculated.",
+        ),
+        Property(
+            "externalOptions",
+            BooleanType,
+            description="Whether the property uses external options.",
+        ),
+        Property(
+            "hasUniqueValue",
+            BooleanType,
+            description="Whether the property must have a unique value.",
+        ),
+        Property(
+            "hidden",
+            BooleanType,
+            description="Whether the property is hidden.",
+        ),
+        Property(
+            "hubspotDefined",
+            BooleanType,
+            description="Whether the property is defined by HubSpot.",
+        ),
         Property(
             "modificationMetadata",
             ObjectType(
-                Property("readOnlyOptions", BooleanType),
-                Property("readOnlyValue", BooleanType),
-                Property("readOnlyDefinition", BooleanType),
-                Property("archivable", BooleanType),
+                Property(
+                    "readOnlyOptions",
+                    BooleanType,
+                    description="Whether options are read-only.",
+                ),
+                Property(
+                    "readOnlyValue",
+                    BooleanType,
+                    description="Whether the value is read-only.",
+                ),
+                Property(
+                    "readOnlyDefinition",
+                    BooleanType,
+                    description="Whether the definition is read-only.",
+                ),
+                Property(
+                    "archivable",
+                    BooleanType,
+                    description="Whether the property can be archived.",
+                ),
             ),
+            description="Metadata about property modification permissions.",
         ),
-        Property("formField", BooleanType),
-        Property("hubspot_object", StringType),
+        Property(
+            "formField",
+            BooleanType,
+            description="Whether the property is used in forms.",
+        ),
+        Property(
+            "hubspot_object",
+            StringType,
+            description="HubSpot object type the property belongs to.",
+        ),
     ).to_dict()
 
     @property
@@ -641,43 +1563,145 @@ class PropertyMeetingStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = PropertiesList(
-        Property("updatedAt", StringType),
-        Property("createdAt", StringType),
-        Property("name", StringType),
-        Property("label", StringType),
-        Property("type", StringType),
-        Property("fieldType", StringType),
-        Property("description", StringType),
-        Property("groupName", StringType),
+        Property(
+            "updatedAt",
+            StringType,
+            description="Timestamp when the record was last updated.",
+        ),
+        Property(
+            "createdAt",
+            StringType,
+            description="Timestamp when the record was created.",
+        ),
+        Property(
+            "name",
+            StringType,
+            description="Internal name of the property.",
+        ),
+        Property(
+            "label",
+            StringType,
+            description="Display label of the property.",
+        ),
+        Property(
+            "type",
+            StringType,
+            description="Type classification of the record.",
+        ),
+        Property(
+            "fieldType",
+            StringType,
+            description="Field type used in forms and UI.",
+        ),
+        Property(
+            "description",
+            StringType,
+            description="Description of the property.",
+        ),
+        Property(
+            "groupName",
+            StringType,
+            description="Name of the property group.",
+        ),
         Property(
             "options",
             ArrayType(
                 ObjectType(
-                    Property("label", StringType),
-                    Property("description", StringType),
-                    Property("value", StringType),
-                    Property("displayOrder", IntegerType),
-                    Property("hidden", BooleanType),
+                    Property(
+                        "label",
+                        StringType,
+                        description="Display label for the option.",
+                    ),
+                    Property(
+                        "description",
+                        StringType,
+                        description="Description of the option.",
+                    ),
+                    Property(
+                        "value",
+                        StringType,
+                        description="Value of the option.",
+                    ),
+                    Property(
+                        "displayOrder",
+                        IntegerType,
+                        description="Order in which the option is displayed.",
+                    ),
+                    Property(
+                        "hidden",
+                        BooleanType,
+                        description="Whether the option is hidden.",
+                    ),
                 ),
             ),
+            description="List of options for the property.",
         ),
-        Property("displayOrder", IntegerType),
-        Property("calculated", BooleanType),
-        Property("externalOptions", BooleanType),
-        Property("hasUniqueValue", BooleanType),
-        Property("hidden", BooleanType),
-        Property("hubspotDefined", BooleanType),
+        Property(
+            "displayOrder",
+            IntegerType,
+            description="Order in which the property is displayed.",
+        ),
+        Property(
+            "calculated",
+            BooleanType,
+            description="Whether the property is calculated.",
+        ),
+        Property(
+            "externalOptions",
+            BooleanType,
+            description="Whether the property uses external options.",
+        ),
+        Property(
+            "hasUniqueValue",
+            BooleanType,
+            description="Whether the property must have a unique value.",
+        ),
+        Property(
+            "hidden",
+            BooleanType,
+            description="Whether the property is hidden.",
+        ),
+        Property(
+            "hubspotDefined",
+            BooleanType,
+            description="Whether the property is defined by HubSpot.",
+        ),
         Property(
             "modificationMetadata",
             ObjectType(
-                Property("readOnlyOptions", BooleanType),
-                Property("readOnlyValue", BooleanType),
-                Property("readOnlyDefinition", BooleanType),
-                Property("archivable", BooleanType),
+                Property(
+                    "readOnlyOptions",
+                    BooleanType,
+                    description="Whether options are read-only.",
+                ),
+                Property(
+                    "readOnlyValue",
+                    BooleanType,
+                    description="Whether the value is read-only.",
+                ),
+                Property(
+                    "readOnlyDefinition",
+                    BooleanType,
+                    description="Whether the definition is read-only.",
+                ),
+                Property(
+                    "archivable",
+                    BooleanType,
+                    description="Whether the property can be archived.",
+                ),
             ),
+            description="Metadata about property modification permissions.",
         ),
-        Property("formField", BooleanType),
-        Property("hubspot_object", StringType),
+        Property(
+            "formField",
+            BooleanType,
+            description="Whether the property is used in forms.",
+        ),
+        Property(
+            "hubspot_object",
+            StringType,
+            description="HubSpot object type the property belongs to.",
+        ),
     ).to_dict()
 
     @property
@@ -708,43 +1732,145 @@ class PropertyTaskStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = PropertiesList(
-        Property("updatedAt", StringType),
-        Property("createdAt", StringType),
-        Property("name", StringType),
-        Property("label", StringType),
-        Property("type", StringType),
-        Property("fieldType", StringType),
-        Property("description", StringType),
-        Property("groupName", StringType),
+        Property(
+            "updatedAt",
+            StringType,
+            description="Timestamp when the record was last updated.",
+        ),
+        Property(
+            "createdAt",
+            StringType,
+            description="Timestamp when the record was created.",
+        ),
+        Property(
+            "name",
+            StringType,
+            description="Internal name of the property.",
+        ),
+        Property(
+            "label",
+            StringType,
+            description="Display label of the property.",
+        ),
+        Property(
+            "type",
+            StringType,
+            description="Type classification of the record.",
+        ),
+        Property(
+            "fieldType",
+            StringType,
+            description="Field type used in forms and UI.",
+        ),
+        Property(
+            "description",
+            StringType,
+            description="Description of the property.",
+        ),
+        Property(
+            "groupName",
+            StringType,
+            description="Name of the property group.",
+        ),
         Property(
             "options",
             ArrayType(
                 ObjectType(
-                    Property("label", StringType),
-                    Property("description", StringType),
-                    Property("value", StringType),
-                    Property("displayOrder", IntegerType),
-                    Property("hidden", BooleanType),
+                    Property(
+                        "label",
+                        StringType,
+                        description="Display label for the option.",
+                    ),
+                    Property(
+                        "description",
+                        StringType,
+                        description="Description of the option.",
+                    ),
+                    Property(
+                        "value",
+                        StringType,
+                        description="Value of the option.",
+                    ),
+                    Property(
+                        "displayOrder",
+                        IntegerType,
+                        description="Order in which the option is displayed.",
+                    ),
+                    Property(
+                        "hidden",
+                        BooleanType,
+                        description="Whether the option is hidden.",
+                    ),
                 ),
             ),
+            description="List of options for the property.",
         ),
-        Property("displayOrder", IntegerType),
-        Property("calculated", BooleanType),
-        Property("externalOptions", BooleanType),
-        Property("hasUniqueValue", BooleanType),
-        Property("hidden", BooleanType),
-        Property("hubspotDefined", BooleanType),
+        Property(
+            "displayOrder",
+            IntegerType,
+            description="Order in which the property is displayed.",
+        ),
+        Property(
+            "calculated",
+            BooleanType,
+            description="Whether the property is calculated.",
+        ),
+        Property(
+            "externalOptions",
+            BooleanType,
+            description="Whether the property uses external options.",
+        ),
+        Property(
+            "hasUniqueValue",
+            BooleanType,
+            description="Whether the property must have a unique value.",
+        ),
+        Property(
+            "hidden",
+            BooleanType,
+            description="Whether the property is hidden.",
+        ),
+        Property(
+            "hubspotDefined",
+            BooleanType,
+            description="Whether the property is defined by HubSpot.",
+        ),
         Property(
             "modificationMetadata",
             ObjectType(
-                Property("readOnlyOptions", BooleanType),
-                Property("readOnlyValue", BooleanType),
-                Property("readOnlyDefinition", BooleanType),
-                Property("archivable", BooleanType),
+                Property(
+                    "readOnlyOptions",
+                    BooleanType,
+                    description="Whether options are read-only.",
+                ),
+                Property(
+                    "readOnlyValue",
+                    BooleanType,
+                    description="Whether the value is read-only.",
+                ),
+                Property(
+                    "readOnlyDefinition",
+                    BooleanType,
+                    description="Whether the definition is read-only.",
+                ),
+                Property(
+                    "archivable",
+                    BooleanType,
+                    description="Whether the property can be archived.",
+                ),
             ),
+            description="Metadata about property modification permissions.",
         ),
-        Property("formField", BooleanType),
-        Property("hubspot_object", StringType),
+        Property(
+            "formField",
+            BooleanType,
+            description="Whether the property is used in forms.",
+        ),
+        Property(
+            "hubspot_object",
+            StringType,
+            description="HubSpot object type the property belongs to.",
+        ),
     ).to_dict()
 
     @property
@@ -775,43 +1901,145 @@ class PropertyCommunicationStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = PropertiesList(
-        Property("updatedAt", StringType),
-        Property("createdAt", StringType),
-        Property("name", StringType),
-        Property("label", StringType),
-        Property("type", StringType),
-        Property("fieldType", StringType),
-        Property("description", StringType),
-        Property("groupName", StringType),
+        Property(
+            "updatedAt",
+            StringType,
+            description="Timestamp when the record was last updated.",
+        ),
+        Property(
+            "createdAt",
+            StringType,
+            description="Timestamp when the record was created.",
+        ),
+        Property(
+            "name",
+            StringType,
+            description="Internal name of the property.",
+        ),
+        Property(
+            "label",
+            StringType,
+            description="Display label of the property.",
+        ),
+        Property(
+            "type",
+            StringType,
+            description="Type classification of the record.",
+        ),
+        Property(
+            "fieldType",
+            StringType,
+            description="Field type used in forms and UI.",
+        ),
+        Property(
+            "description",
+            StringType,
+            description="Description of the property.",
+        ),
+        Property(
+            "groupName",
+            StringType,
+            description="Name of the property group.",
+        ),
         Property(
             "options",
             ArrayType(
                 ObjectType(
-                    Property("label", StringType),
-                    Property("description", StringType),
-                    Property("value", StringType),
-                    Property("displayOrder", IntegerType),
-                    Property("hidden", BooleanType),
+                    Property(
+                        "label",
+                        StringType,
+                        description="Display label for the option.",
+                    ),
+                    Property(
+                        "description",
+                        StringType,
+                        description="Description of the option.",
+                    ),
+                    Property(
+                        "value",
+                        StringType,
+                        description="Value of the option.",
+                    ),
+                    Property(
+                        "displayOrder",
+                        IntegerType,
+                        description="Order in which the option is displayed.",
+                    ),
+                    Property(
+                        "hidden",
+                        BooleanType,
+                        description="Whether the option is hidden.",
+                    ),
                 ),
             ),
+            description="List of options for the property.",
         ),
-        Property("displayOrder", IntegerType),
-        Property("calculated", BooleanType),
-        Property("externalOptions", BooleanType),
-        Property("hasUniqueValue", BooleanType),
-        Property("hidden", BooleanType),
-        Property("hubspotDefined", BooleanType),
+        Property(
+            "displayOrder",
+            IntegerType,
+            description="Order in which the property is displayed.",
+        ),
+        Property(
+            "calculated",
+            BooleanType,
+            description="Whether the property is calculated.",
+        ),
+        Property(
+            "externalOptions",
+            BooleanType,
+            description="Whether the property uses external options.",
+        ),
+        Property(
+            "hasUniqueValue",
+            BooleanType,
+            description="Whether the property must have a unique value.",
+        ),
+        Property(
+            "hidden",
+            BooleanType,
+            description="Whether the property is hidden.",
+        ),
+        Property(
+            "hubspotDefined",
+            BooleanType,
+            description="Whether the property is defined by HubSpot.",
+        ),
         Property(
             "modificationMetadata",
             ObjectType(
-                Property("readOnlyOptions", BooleanType),
-                Property("readOnlyValue", BooleanType),
-                Property("readOnlyDefinition", BooleanType),
-                Property("archivable", BooleanType),
+                Property(
+                    "readOnlyOptions",
+                    BooleanType,
+                    description="Whether options are read-only.",
+                ),
+                Property(
+                    "readOnlyValue",
+                    BooleanType,
+                    description="Whether the value is read-only.",
+                ),
+                Property(
+                    "readOnlyDefinition",
+                    BooleanType,
+                    description="Whether the definition is read-only.",
+                ),
+                Property(
+                    "archivable",
+                    BooleanType,
+                    description="Whether the property can be archived.",
+                ),
             ),
+            description="Metadata about property modification permissions.",
         ),
-        Property("formField", BooleanType),
-        Property("hubspot_object", StringType),
+        Property(
+            "formField",
+            BooleanType,
+            description="Whether the property is used in forms.",
+        ),
+        Property(
+            "hubspot_object",
+            StringType,
+            description="HubSpot object type the property belongs to.",
+        ),
     ).to_dict()
 
     @property
@@ -842,43 +2070,145 @@ class PropertyNotesStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = PropertiesList(
-        Property("updatedAt", StringType),
-        Property("createdAt", StringType),
-        Property("name", StringType),
-        Property("label", StringType),
-        Property("type", StringType),
-        Property("fieldType", StringType),
-        Property("description", StringType),
-        Property("groupName", StringType),
+        Property(
+            "updatedAt",
+            StringType,
+            description="Timestamp when the record was last updated.",
+        ),
+        Property(
+            "createdAt",
+            StringType,
+            description="Timestamp when the record was created.",
+        ),
+        Property(
+            "name",
+            StringType,
+            description="Internal name of the property.",
+        ),
+        Property(
+            "label",
+            StringType,
+            description="Display label of the property.",
+        ),
+        Property(
+            "type",
+            StringType,
+            description="Type classification of the record.",
+        ),
+        Property(
+            "fieldType",
+            StringType,
+            description="Field type used in forms and UI.",
+        ),
+        Property(
+            "description",
+            StringType,
+            description="Description of the property.",
+        ),
+        Property(
+            "groupName",
+            StringType,
+            description="Name of the property group.",
+        ),
         Property(
             "options",
             ArrayType(
                 ObjectType(
-                    Property("label", StringType),
-                    Property("description", StringType),
-                    Property("value", StringType),
-                    Property("displayOrder", IntegerType),
-                    Property("hidden", BooleanType),
+                    Property(
+                        "label",
+                        StringType,
+                        description="Display label for the option.",
+                    ),
+                    Property(
+                        "description",
+                        StringType,
+                        description="Description of the option.",
+                    ),
+                    Property(
+                        "value",
+                        StringType,
+                        description="Value of the option.",
+                    ),
+                    Property(
+                        "displayOrder",
+                        IntegerType,
+                        description="Order in which the option is displayed.",
+                    ),
+                    Property(
+                        "hidden",
+                        BooleanType,
+                        description="Whether the option is hidden.",
+                    ),
                 ),
             ),
+            description="List of options for the property.",
         ),
-        Property("displayOrder", IntegerType),
-        Property("calculated", BooleanType),
-        Property("externalOptions", BooleanType),
-        Property("hasUniqueValue", BooleanType),
-        Property("hidden", BooleanType),
-        Property("hubspotDefined", BooleanType),
+        Property(
+            "displayOrder",
+            IntegerType,
+            description="Order in which the property is displayed.",
+        ),
+        Property(
+            "calculated",
+            BooleanType,
+            description="Whether the property is calculated.",
+        ),
+        Property(
+            "externalOptions",
+            BooleanType,
+            description="Whether the property uses external options.",
+        ),
+        Property(
+            "hasUniqueValue",
+            BooleanType,
+            description="Whether the property must have a unique value.",
+        ),
+        Property(
+            "hidden",
+            BooleanType,
+            description="Whether the property is hidden.",
+        ),
+        Property(
+            "hubspotDefined",
+            BooleanType,
+            description="Whether the property is defined by HubSpot.",
+        ),
         Property(
             "modificationMetadata",
             ObjectType(
-                Property("readOnlyOptions", BooleanType),
-                Property("readOnlyValue", BooleanType),
-                Property("readOnlyDefinition", BooleanType),
-                Property("archivable", BooleanType),
+                Property(
+                    "readOnlyOptions",
+                    BooleanType,
+                    description="Whether options are read-only.",
+                ),
+                Property(
+                    "readOnlyValue",
+                    BooleanType,
+                    description="Whether the value is read-only.",
+                ),
+                Property(
+                    "readOnlyDefinition",
+                    BooleanType,
+                    description="Whether the definition is read-only.",
+                ),
+                Property(
+                    "archivable",
+                    BooleanType,
+                    description="Whether the property can be archived.",
+                ),
             ),
+            description="Metadata about property modification permissions.",
         ),
-        Property("formField", BooleanType),
-        Property("hubspot_object", StringType),
+        Property(
+            "formField",
+            BooleanType,
+            description="Whether the property is used in forms.",
+        ),
+        Property(
+            "hubspot_object",
+            StringType,
+            description="HubSpot object type the property belongs to.",
+        ),
     ).to_dict()
 
     @property

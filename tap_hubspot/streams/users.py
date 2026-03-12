@@ -24,10 +24,26 @@ class UsersStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = th.PropertiesList(
-        th.Property("id", th.StringType),
-        th.Property("email", th.StringType),
-        th.Property("roleIds", th.ArrayType(th.StringType)),
-        th.Property("primaryteamid", th.StringType),
+        th.Property(
+            "id",
+            th.StringType,
+            description="Unique identifier of the record.",
+        ),
+        th.Property(
+            "email",
+            th.StringType,
+            description="Email address of the user.",
+        ),
+        th.Property(
+            "roleIds",
+            th.ArrayType(th.StringType),
+            description="List of role identifiers assigned to the user.",
+        ),
+        th.Property(
+            "primaryteamid",
+            th.StringType,
+            description="Identifier of the user's primary team.",
+        ),
     ).to_dict()
 
     @property

@@ -31,20 +31,49 @@ class FormSubmissionsStream(HubspotStream):
     page_size = 50
 
     schema = th.PropertiesList(
-        th.Property("conversionId", th.StringType),
-        th.Property("formId", th.StringType),
-        th.Property("submittedAt", th.IntegerType),
+        th.Property(
+            "conversionId",
+            th.StringType,
+            description="Unique identifier of the form submission.",
+        ),
+        th.Property(
+            "formId",
+            th.StringType,
+            description="Identifier of the associated form.",
+        ),
+        th.Property(
+            "submittedAt",
+            th.IntegerType,
+            description="Timestamp when the form was submitted.",
+        ),
         th.Property(
             "values",
             th.ArrayType(
                 th.ObjectType(
-                    th.Property("objectTypeId", th.StringType),
-                    th.Property("name", th.StringType),
-                    th.Property("value", th.StringType),
+                    th.Property(
+                        "objectTypeId",
+                        th.StringType,
+                        description="Identifier of the object type for the field.",
+                    ),
+                    th.Property(
+                        "name",
+                        th.StringType,
+                        description="Name of the form field.",
+                    ),
+                    th.Property(
+                        "value",
+                        th.StringType,
+                        description="Value submitted for the field.",
+                    ),
                 )
             ),
+            description="List of submitted form field values.",
         ),
-        th.Property("pageUrl", th.StringType),
+        th.Property(
+            "pageUrl",
+            th.StringType,
+            description="URL of the page where the form was submitted.",
+        ),
     ).to_dict()
 
     def post_process(self, row: dict[str, Any], context: Mapping[str, Any] | None = None) -> dict | None:

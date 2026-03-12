@@ -24,14 +24,46 @@ class OwnersStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = th.PropertiesList(
-        th.Property("id", th.StringType),
-        th.Property("email", th.StringType),
-        th.Property("firstName", th.StringType),
-        th.Property("lastName", th.StringType),
-        th.Property("userId", th.IntegerType),
-        th.Property("createdAt", th.StringType),
-        th.Property("updatedAt", th.StringType),
-        th.Property("archived", th.BooleanType),
+        th.Property(
+            "id",
+            th.StringType,
+            description="Unique identifier of the record.",
+        ),
+        th.Property(
+            "email",
+            th.StringType,
+            description="Email address of the owner.",
+        ),
+        th.Property(
+            "firstName",
+            th.StringType,
+            description="First name of the owner.",
+        ),
+        th.Property(
+            "lastName",
+            th.StringType,
+            description="Last name of the owner.",
+        ),
+        th.Property(
+            "userId",
+            th.IntegerType,
+            description="Identifier of the associated user.",
+        ),
+        th.Property(
+            "createdAt",
+            th.StringType,
+            description="Timestamp when the record was created.",
+        ),
+        th.Property(
+            "updatedAt",
+            th.StringType,
+            description="Timestamp when the record was last updated.",
+        ),
+        th.Property(
+            "archived",
+            th.BooleanType,
+            description="Whether the record is archived.",
+        ),
     ).to_dict()
 
     @property

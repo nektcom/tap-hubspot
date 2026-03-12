@@ -24,23 +24,72 @@ class FeedbackSubmissionsStream(HubspotStream):
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
 
     schema = th.PropertiesList(
-        th.Property("id", th.StringType),
+        th.Property(
+            "id",
+            th.StringType,
+            description="Unique identifier of the record.",
+        ),
         th.Property(
             "properties",
             th.ObjectType(
-                th.Property("city", th.StringType),
-                th.Property("createdDate", th.StringType),
-                th.Property("domain", th.StringType),
-                th.Property("hs_lastmodifieddate", th.StringType),
-                th.Property("industry", th.StringType),
-                th.Property("name", th.StringType),
-                th.Property("phone", th.StringType),
-                th.Property("state", th.StringType),
+                th.Property(
+                    "city",
+                    th.StringType,
+                    description="City from the feedback submission.",
+                ),
+                th.Property(
+                    "createdDate",
+                    th.StringType,
+                    description="Timestamp when the record was created.",
+                ),
+                th.Property(
+                    "domain",
+                    th.StringType,
+                    description="Domain associated with the submission.",
+                ),
+                th.Property(
+                    "hs_lastmodifieddate",
+                    th.StringType,
+                    description="Timestamp when the record was last updated.",
+                ),
+                th.Property(
+                    "industry",
+                    th.StringType,
+                    description="Industry from the feedback submission.",
+                ),
+                th.Property(
+                    "name",
+                    th.StringType,
+                    description="Name of the record.",
+                ),
+                th.Property(
+                    "phone",
+                    th.StringType,
+                    description="Phone number from the feedback submission.",
+                ),
+                th.Property(
+                    "state",
+                    th.StringType,
+                    description="State or status from the feedback submission.",
+                ),
             ),
+            description="Object containing the feedback submission's custom properties.",
         ),
-        th.Property("createdAt", th.StringType),
-        th.Property("updatedAt", th.StringType),
-        th.Property("archived", th.BooleanType),
+        th.Property(
+            "createdAt",
+            th.StringType,
+            description="Timestamp when the record was created.",
+        ),
+        th.Property(
+            "updatedAt",
+            th.StringType,
+            description="Timestamp when the record was last updated.",
+        ),
+        th.Property(
+            "archived",
+            th.BooleanType,
+            description="Whether the record is archived.",
+        ),
     ).to_dict()
 
     @property

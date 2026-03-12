@@ -46,10 +46,19 @@ class CompanyStream(DynamicIncrementalHubspotStream):
                         association_string,
                         th.ArrayType(
                             th.ObjectType(
-                                th.Property("id", th.StringType),
-                                th.Property("type", th.StringType),
+                                th.Property(
+                                    "id",
+                                    th.StringType,
+                                    description="Unique identifier of the associated record.",
+                                ),
+                                th.Property(
+                                    "type",
+                                    th.StringType,
+                                    description="Type classification of the association.",
+                                ),
                             )
                         ),
+                        description="List of associated records.",
                     )
                 )
 
