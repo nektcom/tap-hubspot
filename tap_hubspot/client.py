@@ -208,6 +208,16 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    @cached_property
+    def _requests_session(self) -> requests.Session:
+        session = requests.Session()
+        adapter = requests.adapters.HTTPAdapter(
+            pool_connections=10,
+            pool_maxsize=10,
+        )
+        session.mount("https://", adapter)
+        return session
+
     def _is_incremental_search(self, context):
         return self.replication_key and self.incremental_path is not None
 
@@ -410,7 +420,7 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
             )
 
             try:
-                response = requests.get(details_url, params=params, headers=headers, timeout=30)
+                response = self._requests_session.get(details_url, params=params, headers=headers, timeout=30)
                 response.raise_for_status()
 
                 response_payload = response.json()
