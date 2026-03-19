@@ -1832,3 +1832,48 @@ class TaskStream(DynamicIncrementalHubspotStream):
         Returns an updated path which includes the api version
         """
         return "https://api.hubapi.com/crm/v3"
+
+
+class AuditLogsStream(HubspotStream):
+    """
+    https://developers.hubspot.com/docs/api-reference/account-audit-logs-v3/guide
+
+    Extracts audit log entries from the HubSpot Account Activity API.
+    Tracks user actions such as CRM object creation, property updates,
+    security activity, and more.
+
+    Requires 'account-info.security.read' scope (Enterprise accounts only).
+    """
+
+    name = "audit_logs"
+    path = "/activity/audit-logs"
+    primary_keys = ["id"]
+    replication_key = "occurredAt"
+    records_jsonpath = "$[results][*]"
+
+    schema = PropertiesList(
+        Property("id", StringType),
+        Property("category", StringType),
+        Property("subCategory", StringType),
+        Property("action", StringType),
+        Property("targetObjectId", StringType),
+        Property("occurredAt", DateTimeType),
+        Property(
+            "actingUser",
+            ObjectType(
+                Property("userId", StringType),
+                Property("userEmail", StringType),
+            ),
+        ),
+    ).to_dict()
+
+    @property
+    def url_base(self) -> str:
+        return "https://api.hubapi.com/account-info/v3"
+
+    def get_url_params(self, context, next_page_token):
+        params = super().get_url_params(context, next_page_token)
+        starting_value = self.get_starting_replication_key_value(context)
+        if starting_value:
+            params["occurredAfter"] = starting_value
+        return params
