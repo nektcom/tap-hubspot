@@ -343,6 +343,10 @@ class PropertyTicketStream(HubspotStream):
         ),
         Property("formField", BooleanType),
         Property("hubspot_object", StringType),
+        Property("createdUserId", StringType),
+        Property("updatedUserId", StringType),
+        Property("referencedObjectType", StringType),
+        Property("calculationFormula", StringType),
     ).to_dict()
 
     @property
@@ -411,6 +415,9 @@ class PropertyDealStream(HubspotStream):
         ),
         Property("formField", BooleanType),
         Property("hubspot_object", StringType),
+        Property("createdUserId", StringType),
+        Property("updatedUserId", StringType),
+        Property("referencedObjectType", StringType),
         Property("calculationFormula", StringType),
     ).to_dict()
 
@@ -480,6 +487,10 @@ class PropertyContactStream(HubspotStream):
         ),
         Property("formField", BooleanType),
         Property("hubspot_object", StringType),
+        Property("createdUserId", StringType),
+        Property("updatedUserId", StringType),
+        Property("referencedObjectType", StringType),
+        Property("calculationFormula", StringType),
     ).to_dict()
 
     @property
@@ -548,6 +559,10 @@ class PropertyCompanyStream(HubspotStream):
         ),
         Property("formField", BooleanType),
         Property("hubspot_object", StringType),
+        Property("createdUserId", StringType),
+        Property("updatedUserId", StringType),
+        Property("referencedObjectType", StringType),
+        Property("calculationFormula", StringType),
     ).to_dict()
 
     @property
@@ -616,6 +631,10 @@ class PropertyProductStream(HubspotStream):
         ),
         Property("formField", BooleanType),
         Property("hubspot_object", StringType),
+        Property("createdUserId", StringType),
+        Property("updatedUserId", StringType),
+        Property("referencedObjectType", StringType),
+        Property("calculationFormula", StringType),
     ).to_dict()
 
     @property
@@ -684,6 +703,10 @@ class PropertyLineItemStream(HubspotStream):
         ),
         Property("formField", BooleanType),
         Property("hubspot_object", StringType),
+        Property("createdUserId", StringType),
+        Property("updatedUserId", StringType),
+        Property("referencedObjectType", StringType),
+        Property("calculationFormula", StringType),
     ).to_dict()
 
     @property
@@ -752,6 +775,10 @@ class PropertyEmailStream(HubspotStream):
         ),
         Property("formField", BooleanType),
         Property("hubspot_object", StringType),
+        Property("createdUserId", StringType),
+        Property("updatedUserId", StringType),
+        Property("referencedObjectType", StringType),
+        Property("calculationFormula", StringType),
     ).to_dict()
 
     @property
@@ -820,6 +847,10 @@ class PropertyPostalMailStream(HubspotStream):
         ),
         Property("formField", BooleanType),
         Property("hubspot_object", StringType),
+        Property("createdUserId", StringType),
+        Property("updatedUserId", StringType),
+        Property("referencedObjectType", StringType),
+        Property("calculationFormula", StringType),
     ).to_dict()
 
     @property
@@ -888,6 +919,10 @@ class PropertyCallStream(HubspotStream):
         ),
         Property("formField", BooleanType),
         Property("hubspot_object", StringType),
+        Property("createdUserId", StringType),
+        Property("updatedUserId", StringType),
+        Property("referencedObjectType", StringType),
+        Property("calculationFormula", StringType),
     ).to_dict()
 
     @property
@@ -956,6 +991,10 @@ class PropertyMeetingStream(HubspotStream):
         ),
         Property("formField", BooleanType),
         Property("hubspot_object", StringType),
+        Property("createdUserId", StringType),
+        Property("updatedUserId", StringType),
+        Property("referencedObjectType", StringType),
+        Property("calculationFormula", StringType),
     ).to_dict()
 
     @property
@@ -1024,6 +1063,10 @@ class PropertyTaskStream(HubspotStream):
         ),
         Property("formField", BooleanType),
         Property("hubspot_object", StringType),
+        Property("createdUserId", StringType),
+        Property("updatedUserId", StringType),
+        Property("referencedObjectType", StringType),
+        Property("calculationFormula", StringType),
     ).to_dict()
 
     @property
@@ -1092,6 +1135,10 @@ class PropertyCommunicationStream(HubspotStream):
         ),
         Property("formField", BooleanType),
         Property("hubspot_object", StringType),
+        Property("createdUserId", StringType),
+        Property("updatedUserId", StringType),
+        Property("referencedObjectType", StringType),
+        Property("calculationFormula", StringType),
     ).to_dict()
 
     @property
@@ -1160,6 +1207,10 @@ class PropertyNotesStream(HubspotStream):
         ),
         Property("formField", BooleanType),
         Property("hubspot_object", StringType),
+        Property("createdUserId", StringType),
+        Property("updatedUserId", StringType),
+        Property("referencedObjectType", StringType),
+        Property("calculationFormula", StringType),
     ).to_dict()
 
     @property
