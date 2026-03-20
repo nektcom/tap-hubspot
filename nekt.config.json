@@ -239,6 +239,16 @@
             "dependent": "extract_deal_property_history",
             "description": "Comma separated list with the name of the properties that should be extracted, e.g.: \"dealstage, hs_lastmodifieddate\".",
             "advanced_settings": true
+          },
+          "property_objects": {
+            "type": "string",
+            "order": 19,
+            "title": "Property objects (comma separated)",
+            "default": "calls, communication, company, contacts, deals, email, line_item, meeting, notes, postal_mail, product, task, tickets",
+            "el_type": "extractor",
+            "docs_url": "https://developers.hubspot.com/docs/api-reference/crm-properties-v3/guide#retrieve-properties",
+            "description": "Comma separated list of HubSpot object types to fetch property definitions for.",
+            "advanced_settings": true
           }
         }
       }

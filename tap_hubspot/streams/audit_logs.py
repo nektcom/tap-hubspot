@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
+from typing import Any, Generator
+
+import requests
 from nekt_singer_sdk import typing as th
+from nekt_singer_sdk.custom_logger import user_logger
+from singer_sdk.exceptions import FatalAPIError
 from tap_hubspot.client import HubspotStream
 
 PropertiesList = th.PropertiesList
@@ -88,3 +93,16 @@ class AuditLogsStream(HubspotStream):
         if starting_value:
             params["occurredAfter"] = starting_value
         return params
+
+    def get_records(self, context: dict | None) -> Generator[dict, Any, None]:
+        try:
+            yield from super().get_records(context)
+        except FatalAPIError as e:
+            if "403" in str(e) or "MISSING_SCOPES" in str(e):
+                user_logger.warning(
+                    "audit_logs stream is not available: missing 'account-info.security.read' scope. "
+                    "This scope requires a HubSpot Enterprise account and re-authorization of the OAuth connection. "
+                    "Skipping stream."
+                )
+                return
+            raise

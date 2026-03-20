@@ -32,7 +32,7 @@ from tap_hubspot.streams import (
     OwnersStream,
     PostalMailStream,
     ProductStream,
-    PropertyNotesStream,
+    PropertiesStream,
     QuoteStream,
     TaskStream,
     TicketPipelineStream,
@@ -192,6 +192,13 @@ class TapHubspot(Tap):
             required=True,
             description="Enable the extraction of leads, only available for accounts with HubSpot Pro, Enterprise, or Enterprise Plus",
         ),
+        th.Property(
+            "property_objects",
+            th.StringType,
+            required=False,
+            default="calls, communication, company, contacts, deals, email, line_item, meeting, notes, postal_mail, product, task, tickets",
+            description="Comma separated list of HubSpot object types to fetch property definitions for.",
+        ),
     ).to_dict()
 
     def discover_streams(self) -> list[HubspotStream]:
@@ -225,7 +232,7 @@ class TapHubspot(Tap):
                 TicketPipelineStream(self),
                 DealPipelineStream(self),
                 # EmailSubscriptionStream(self),
-                PropertyNotesStream(self),
+                PropertiesStream(self),
                 CompanyStream(self),
                 DealStream(self),
                 # FeedbackSubmissionsStream(self),
