@@ -1,3 +1,4 @@
+from .audit_logs import AuditLogsStream
 from .calls import CallStream
 from .communication import CommunicationStream
 from .companies import CompanyStream
