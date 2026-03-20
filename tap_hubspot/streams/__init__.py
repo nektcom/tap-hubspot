@@ -1,3 +1,4 @@
+from .audit_logs import AuditLogsStream
 from .calls import CallStream
 from .communication import CommunicationStream
 from .companies import CompanyStream
@@ -19,21 +20,7 @@ from .notes import NoteStream
 from .owners import OwnersStream
 from .postal_mail import PostalMailStream
 from .products import ProductStream
-from .properties import (
-    PropertyCallStream,
-    PropertyCommunicationStream,
-    PropertyCompanyStream,
-    PropertyContactStream,
-    PropertyDealStream,
-    PropertyEmailStream,
-    PropertyLineItemStream,
-    PropertyMeetingStream,
-    PropertyNotesStream,
-    PropertyPostalMailStream,
-    PropertyProductStream,
-    PropertyTaskStream,
-    PropertyTicketStream,
-)
+from .properties import PropertiesStream
 from .quotes import QuoteStream
 from .tasks import TaskStream
 from .ticket_pipelines import TicketPipelineStream
