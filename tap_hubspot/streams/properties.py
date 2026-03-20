@@ -176,6 +176,26 @@ class PropertyTicketStream(HubspotStream):
             StringType,
             description="HubSpot object type the property belongs to.",
         ),
+        Property(
+            "createdUserId",
+            StringType,
+            description="ID of the user who created the property.",
+        ),
+        Property(
+            "updatedUserId",
+            StringType,
+            description="ID of the user who last updated the property.",
+        ),
+        Property(
+            "referencedObjectType",
+            StringType,
+            description="Object type referenced by this property (e.g. OWNER).",
+        ),
+        Property(
+            "calculationFormula",
+            StringType,
+            description="Formula used for calculated properties.",
+        ),
     ).to_dict()
 
     @property
@@ -344,6 +364,21 @@ class PropertyDealStream(HubspotStream):
             "hubspot_object",
             StringType,
             description="HubSpot object type the property belongs to.",
+        ),
+        Property(
+            "createdUserId",
+            StringType,
+            description="ID of the user who created the property.",
+        ),
+        Property(
+            "updatedUserId",
+            StringType,
+            description="ID of the user who last updated the property.",
+        ),
+        Property(
+            "referencedObjectType",
+            StringType,
+            description="Object type referenced by this property (e.g. OWNER).",
         ),
         Property(
             "calculationFormula",
@@ -519,6 +554,26 @@ class PropertyContactStream(HubspotStream):
             StringType,
             description="HubSpot object type the property belongs to.",
         ),
+        Property(
+            "createdUserId",
+            StringType,
+            description="ID of the user who created the property.",
+        ),
+        Property(
+            "updatedUserId",
+            StringType,
+            description="ID of the user who last updated the property.",
+        ),
+        Property(
+            "referencedObjectType",
+            StringType,
+            description="Object type referenced by this property (e.g. OWNER).",
+        ),
+        Property(
+            "calculationFormula",
+            StringType,
+            description="Formula used for calculated properties.",
+        ),
     ).to_dict()
 
     @property
@@ -687,6 +742,26 @@ class PropertyCompanyStream(HubspotStream):
             "hubspot_object",
             StringType,
             description="HubSpot object type the property belongs to.",
+        ),
+        Property(
+            "createdUserId",
+            StringType,
+            description="ID of the user who created the property.",
+        ),
+        Property(
+            "updatedUserId",
+            StringType,
+            description="ID of the user who last updated the property.",
+        ),
+        Property(
+            "referencedObjectType",
+            StringType,
+            description="Object type referenced by this property (e.g. OWNER).",
+        ),
+        Property(
+            "calculationFormula",
+            StringType,
+            description="Formula used for calculated properties.",
         ),
     ).to_dict()
 
@@ -857,6 +932,26 @@ class PropertyProductStream(HubspotStream):
             StringType,
             description="HubSpot object type the property belongs to.",
         ),
+        Property(
+            "createdUserId",
+            StringType,
+            description="ID of the user who created the property.",
+        ),
+        Property(
+            "updatedUserId",
+            StringType,
+            description="ID of the user who last updated the property.",
+        ),
+        Property(
+            "referencedObjectType",
+            StringType,
+            description="Object type referenced by this property (e.g. OWNER).",
+        ),
+        Property(
+            "calculationFormula",
+            StringType,
+            description="Formula used for calculated properties.",
+        ),
     ).to_dict()
 
     @property
@@ -1025,6 +1120,26 @@ class PropertyLineItemStream(HubspotStream):
             "hubspot_object",
             StringType,
             description="HubSpot object type the property belongs to.",
+        ),
+        Property(
+            "createdUserId",
+            StringType,
+            description="ID of the user who created the property.",
+        ),
+        Property(
+            "updatedUserId",
+            StringType,
+            description="ID of the user who last updated the property.",
+        ),
+        Property(
+            "referencedObjectType",
+            StringType,
+            description="Object type referenced by this property (e.g. OWNER).",
+        ),
+        Property(
+            "calculationFormula",
+            StringType,
+            description="Formula used for calculated properties.",
         ),
     ).to_dict()
 
@@ -1195,6 +1310,26 @@ class PropertyEmailStream(HubspotStream):
             StringType,
             description="HubSpot object type the property belongs to.",
         ),
+        Property(
+            "createdUserId",
+            StringType,
+            description="ID of the user who created the property.",
+        ),
+        Property(
+            "updatedUserId",
+            StringType,
+            description="ID of the user who last updated the property.",
+        ),
+        Property(
+            "referencedObjectType",
+            StringType,
+            description="Object type referenced by this property (e.g. OWNER).",
+        ),
+        Property(
+            "calculationFormula",
+            StringType,
+            description="Formula used for calculated properties.",
+        ),
     ).to_dict()
 
     @property
@@ -1363,6 +1498,26 @@ class PropertyPostalMailStream(HubspotStream):
             "hubspot_object",
             StringType,
             description="HubSpot object type the property belongs to.",
+        ),
+        Property(
+            "createdUserId",
+            StringType,
+            description="ID of the user who created the property.",
+        ),
+        Property(
+            "updatedUserId",
+            StringType,
+            description="ID of the user who last updated the property.",
+        ),
+        Property(
+            "referencedObjectType",
+            StringType,
+            description="Object type referenced by this property (e.g. OWNER).",
+        ),
+        Property(
+            "calculationFormula",
+            StringType,
+            description="Formula used for calculated properties.",
         ),
     ).to_dict()
 
@@ -1533,6 +1688,26 @@ class PropertyCallStream(HubspotStream):
             StringType,
             description="HubSpot object type the property belongs to.",
         ),
+        Property(
+            "createdUserId",
+            StringType,
+            description="ID of the user who created the property.",
+        ),
+        Property(
+            "updatedUserId",
+            StringType,
+            description="ID of the user who last updated the property.",
+        ),
+        Property(
+            "referencedObjectType",
+            StringType,
+            description="Object type referenced by this property (e.g. OWNER).",
+        ),
+        Property(
+            "calculationFormula",
+            StringType,
+            description="Formula used for calculated properties.",
+        ),
     ).to_dict()
 
     @property
@@ -1701,6 +1876,26 @@ class PropertyMeetingStream(HubspotStream):
             "hubspot_object",
             StringType,
             description="HubSpot object type the property belongs to.",
+        ),
+        Property(
+            "createdUserId",
+            StringType,
+            description="ID of the user who created the property.",
+        ),
+        Property(
+            "updatedUserId",
+            StringType,
+            description="ID of the user who last updated the property.",
+        ),
+        Property(
+            "referencedObjectType",
+            StringType,
+            description="Object type referenced by this property (e.g. OWNER).",
+        ),
+        Property(
+            "calculationFormula",
+            StringType,
+            description="Formula used for calculated properties.",
         ),
     ).to_dict()
 
@@ -1871,6 +2066,26 @@ class PropertyTaskStream(HubspotStream):
             StringType,
             description="HubSpot object type the property belongs to.",
         ),
+        Property(
+            "createdUserId",
+            StringType,
+            description="ID of the user who created the property.",
+        ),
+        Property(
+            "updatedUserId",
+            StringType,
+            description="ID of the user who last updated the property.",
+        ),
+        Property(
+            "referencedObjectType",
+            StringType,
+            description="Object type referenced by this property (e.g. OWNER).",
+        ),
+        Property(
+            "calculationFormula",
+            StringType,
+            description="Formula used for calculated properties.",
+        ),
     ).to_dict()
 
     @property
@@ -2040,6 +2255,26 @@ class PropertyCommunicationStream(HubspotStream):
             StringType,
             description="HubSpot object type the property belongs to.",
         ),
+        Property(
+            "createdUserId",
+            StringType,
+            description="ID of the user who created the property.",
+        ),
+        Property(
+            "updatedUserId",
+            StringType,
+            description="ID of the user who last updated the property.",
+        ),
+        Property(
+            "referencedObjectType",
+            StringType,
+            description="Object type referenced by this property (e.g. OWNER).",
+        ),
+        Property(
+            "calculationFormula",
+            StringType,
+            description="Formula used for calculated properties.",
+        ),
     ).to_dict()
 
     @property
@@ -2208,6 +2443,26 @@ class PropertyNotesStream(HubspotStream):
             "hubspot_object",
             StringType,
             description="HubSpot object type the property belongs to.",
+        ),
+        Property(
+            "createdUserId",
+            StringType,
+            description="ID of the user who created the property.",
+        ),
+        Property(
+            "updatedUserId",
+            StringType,
+            description="ID of the user who last updated the property.",
+        ),
+        Property(
+            "referencedObjectType",
+            StringType,
+            description="Object type referenced by this property (e.g. OWNER).",
+        ),
+        Property(
+            "calculationFormula",
+            StringType,
+            description="Formula used for calculated properties.",
         ),
     ).to_dict()
 
