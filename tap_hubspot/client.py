@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sys
 from functools import cached_property
 from http import HTTPStatus
@@ -131,12 +132,20 @@ class DynamicHubspotStream(HubspotStream):
         return self.name
 
     @cached_property
+    def _properties_as_json_string(self) -> bool:
+        return self.config.get("properties_as_json_string", False)
+
+    @cached_property
     def schema(self) -> dict:
         """Return a draft JSON schema for this stream."""
-        hs_props = []
         self.hs_properties = self._get_available_properties()
-        for name, type in self.hs_properties.items():
-            hs_props.append(th.Property(name, self._get_datatype(type)))
+
+        if self._properties_as_json_string:
+            properties_type = th.StringType
+        else:
+            hs_props = [th.Property(name, self._get_datatype(type)) for name, type in self.hs_properties.items()]
+            properties_type = th.ObjectType(*hs_props)
+
         schema = th.PropertiesList(
             th.Property(
                 "id",
@@ -145,7 +154,7 @@ class DynamicHubspotStream(HubspotStream):
             ),
             th.Property(
                 "properties",
-                th.ObjectType(*hs_props),
+                properties_type,
                 description="Object containing the record's custom properties.",
             ),
             th.Property(
@@ -165,6 +174,15 @@ class DynamicHubspotStream(HubspotStream):
             ),
         )
         return schema.to_dict()
+
+    def post_process(
+        self,
+        row: dict,
+        context: dict | None = None,
+    ) -> dict | None:
+        if self._properties_as_json_string and isinstance(row.get("properties"), dict):
+            row["properties"] = json.dumps(row["properties"])
+        return row
 
     def _get_available_properties(self) -> dict[str, str]:
         session = requests.Session()
@@ -224,10 +242,14 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
     @cached_property
     def schema(self) -> dict:
         """Return a draft JSON schema for this stream."""
-        hs_props = []
         self.hs_properties = self._get_available_properties()
-        for name, type in self.hs_properties.items():
-            hs_props.append(th.Property(name, self._get_datatype(type)))
+
+        if self._properties_as_json_string:
+            properties_type = th.StringType
+        else:
+            hs_props = [th.Property(name, self._get_datatype(type)) for name, type in self.hs_properties.items()]
+            properties_type = th.ObjectType(*hs_props)
+
         schema = th.PropertiesList(
             th.Property(
                 "id",
@@ -236,7 +258,7 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
             ),
             th.Property(
                 "properties",
-                th.ObjectType(*hs_props),
+                properties_type,
                 description="Object containing the record's custom properties.",
             ),
             th.Property(
@@ -308,6 +330,10 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
                 val = props[self.replication_key]
             row[self.replication_key] = val
         self.last_record_id = row.get("id")
+
+        if self._properties_as_json_string and isinstance(row.get("properties"), dict):
+            row["properties"] = json.dumps(row["properties"])
+
         return row
 
     def prepare_request(self, context: dict | None, next_page_token: Any | None) -> requests.PreparedRequest:

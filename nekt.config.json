@@ -249,6 +249,15 @@
             "docs_url": "https://developers.hubspot.com/docs/api-reference/crm-properties-v3/guide#retrieve-properties",
             "description": "Comma separated list of HubSpot object types to fetch property definitions for.",
             "advanced_settings": true
+          },
+          "properties_as_json_string": {
+            "type": "boolean",
+            "order": 20,
+            "title": "Properties as JSON string",
+            "default": false,
+            "el_type": "extractor",
+            "description": "When enabled, the 'properties' column is emitted as a JSON string instead of a structured object. Use this to work around destination limits on the number of nested fields (e.g. BigQuery's 10,000 field limit).",
+            "advanced_settings": true
           }
         }
       }

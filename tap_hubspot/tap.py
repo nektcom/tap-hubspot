@@ -199,6 +199,14 @@ class TapHubspot(Tap):
             default="calls, communication, company, contacts, deals, email, line_item, meeting, notes, postal_mail, product, task, tickets",
             description="Comma separated list of HubSpot object types to fetch property definitions for.",
         ),
+        th.Property(
+            "properties_as_json_string",
+            th.BooleanType,
+            default=False,
+            required=False,
+            description="When enabled, the 'properties' column is emitted as a JSON string instead of a structured object. "
+            "Use this to work around destination limits on the number of nested fields (e.g. BigQuery's 10,000 field limit).",
+        ),
     ).to_dict()
 
     def discover_streams(self) -> list[HubspotStream]:
@@ -208,6 +216,13 @@ class TapHubspot(Tap):
             A list of discovered streams.
         """
         streams_list = []
+
+        return [
+            DealStream(self),
+            ContactStream(self),
+            TicketStream(self),
+            NoteStream(self),
+        ]
 
         custom_objects = self.get_custom_objects()
         for custom_object in custom_objects:
