@@ -32,8 +32,16 @@ class TicketStream(DynamicIncrementalHubspotStream):
         return self.config.get("extract_ticket_associations_comma_separated_string").replace(" ", "").split(",")
 
     @cached_property
+    def property_history_string_list(self) -> list[str]:
+        return self.config.get("extract_ticket_property_history_comma_separated_string").replace(" ", "").split(",")
+
+    @cached_property
     def should_extract_associations(self) -> bool:
         return self.config.get("extract_ticket_associations") and self.associations_string_list
+
+    @cached_property
+    def should_extract_property_history(self) -> bool:
+        return self.config.get("extract_ticket_property_history") and self.property_history_string_list
 
     @cached_property
     def schema(self) -> dict:
@@ -63,16 +71,57 @@ class TicketStream(DynamicIncrementalHubspotStream):
                 )
 
             schema["properties"]["associations"] = associations_schema.to_dict()
+        if self.should_extract_property_history:
+            property_history_schema = th.PropertiesList()
+            property_history_properties = th.ArrayType(
+                th.ObjectType(
+                    th.Property(
+                        "sourceType",
+                        th.StringType,
+                        description="Type of the change source.",
+                    ),
+                    th.Property(
+                        "sourceId",
+                        th.StringType,
+                        description="Identifier of the change source.",
+                    ),
+                    th.Property(
+                        "updatedByUserId",
+                        th.IntegerType,
+                        description="Identifier of the user who made the change.",
+                    ),
+                    th.Property(
+                        "value",
+                        th.StringType,
+                        description="Value of the property at this change.",
+                    ),
+                    th.Property(
+                        "timestamp",
+                        th.StringType,
+                        description="Timestamp when the change occurred.",
+                    ),
+                )
+            )
+            for property_name in self.property_history_string_list:
+                property_history_schema.append(
+                    th.Property(
+                        property_name,
+                        property_history_properties,
+                        description="History of changes for this property.",
+                    )
+                )
+            schema["properties"]["propertiesWithHistory"] = property_history_schema.to_dict()
         return schema
 
     def post_process(self, row, context=None):
-        if not (self.should_extract_associations):
+        if not (self.should_extract_associations or self.should_extract_property_history):
             return super().post_process(row, context)
 
         additional_data = self._fetch_additional_data_with_retry(
             "tickets",
             row["id"],
             self.associations_string_list if self.should_extract_associations else None,
+            self.property_history_string_list if self.should_extract_property_history else None,
         )
 
         if "associations" in additional_data:

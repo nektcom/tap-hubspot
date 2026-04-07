@@ -116,6 +116,20 @@ class TapHubspot(Tap):
             description="Comma separated string with the name of entities that should be extracted",
         ),
         th.Property(
+            "extract_ticket_property_history",
+            th.BooleanType,
+            default=False,
+            required=True,
+            description="Enable the extraction of property history for tickets",
+        ),
+        th.Property(
+            "extract_ticket_property_history_comma_separated_string",
+            th.StringType,
+            required=False,
+            default="hs_pipeline_stage,hs_ticket_priority",
+            description="Comma separated string with the name of properties that should be extracted with history.",
+        ),
+        th.Property(
             "extract_lead_associations",
             th.BooleanType,
             default=False,

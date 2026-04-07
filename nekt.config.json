@@ -94,7 +94,7 @@
           },
           "extract_contact_associations": {
             "type": "boolean",
-            "order": 5,
+            "order": 6,
             "title": "Extract contact associations",
             "default": false,
             "el_type": "extractor",
@@ -104,7 +104,7 @@
           },
           "extract_contact_associations_comma_separated_string": {
             "type": "string",
-            "order": 6,
+            "order": 7,
             "title": "Contact associations entities (comma separated)",
             "default": "calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks, tickets",
             "el_type": "extractor",
@@ -115,7 +115,7 @@
           },
           "extract_ticket_associations": {
             "type": "boolean",
-            "order": 7,
+            "order": 8,
             "title": "Extract ticket associations",
             "default": false,
             "el_type": "extractor",
@@ -125,7 +125,7 @@
           },
           "extract_ticket_associations_comma_separated_string": {
             "type": "string",
-            "order": 8,
+            "order": 9,
             "title": "Ticket associations entities (comma separated)",
             "default": "calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks, tickets",
             "el_type": "extractor",
@@ -136,7 +136,7 @@
           },
           "extract_lead_associations": {
             "type": "boolean",
-            "order": 9,
+            "order": 10,
             "title": "Extract lead associations",
             "default": false,
             "el_type": "extractor",
@@ -147,7 +147,7 @@
           },
           "extract_lead_associations_comma_separated_string": {
             "type": "string",
-            "order": 10,
+            "order": 11,
             "title": "Lead associations entities (comma separated)",
             "default": "calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks, tickets",
             "el_type": "extractor",
@@ -158,7 +158,7 @@
           },
           "extract_company_associations": {
             "type": "boolean",
-            "order": 11,
+            "order": 12,
             "title": "Extract company associations",
             "default": false,
             "el_type": "extractor",
@@ -168,7 +168,7 @@
           },
           "extract_company_associations_comma_separated_string": {
             "type": "string",
-            "order": 12,
+            "order": 13,
             "title": "Company associations entities (comma separated)",
             "default": "calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks, tickets",
             "el_type": "extractor",
@@ -179,7 +179,7 @@
           },
           "extract_email_associations": {
             "type": "boolean",
-            "order": 13,
+            "order": 14,
             "title": "Extract email associations",
             "default": false,
             "el_type": "extractor",
@@ -189,7 +189,7 @@
           },
           "extract_email_associations_comma_separated_string": {
             "type": "string",
-            "order": 14,
+            "order": 15,
             "title": "Email associations entities (comma separated)",
             "default": "companies, contacts, deals, tickets",
             "el_type": "extractor",
@@ -200,7 +200,7 @@
           },
           "extract_contact_property_history": {
             "type": "boolean",
-            "order": 15,
+            "order": 16,
             "title": "Extract contact properties history",
             "default": false,
             "el_type": "extractor",
@@ -210,7 +210,7 @@
           },
           "extract_contact_property_history_comma_separated_string": {
             "type": "string",
-            "order": 16,
+            "order": 17,
             "title": "Contact properties history (comma separated)",
             "default": "lifecyclestage",
             "el_type": "extractor",
@@ -221,7 +221,7 @@
           },
           "extract_deal_property_history": {
             "type": "boolean",
-            "order": 17,
+            "order": 18,
             "title": "Extract deal properties history",
             "default": false,
             "el_type": "extractor",
@@ -231,7 +231,7 @@
           },
           "extract_deal_property_history_comma_separated_string": {
             "type": "string",
-            "order": 18,
+            "order": 19,
             "title": "Deal properties history (comma separated)",
             "default": "dealstage",
             "el_type": "extractor",
@@ -240,9 +240,30 @@
             "description": "Comma separated list with the name of the properties that should be extracted, e.g.: \"dealstage, hs_lastmodifieddate\".",
             "advanced_settings": true
           },
+          "extract_ticket_property_history": {
+            "type": "boolean",
+            "order": 20,
+            "title": "Extract ticket properties history",
+            "default": false,
+            "el_type": "extractor",
+            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/objects/tickets",
+            "description": "Enable the extraction of properties history for tickets. Enable only if necessary, since it significantly increases the extraction time.",
+            "advanced_settings": true
+          },
+          "extract_ticket_property_history_comma_separated_string": {
+            "type": "string",
+            "order": 21,
+            "title": "Ticket properties history (comma separated)",
+            "default": "hs_pipeline_stage,hs_ticket_priority",
+            "el_type": "extractor",
+            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/objects/tickets",
+            "dependent": "extract_ticket_property_history",
+            "description": "Comma separated list with the name of the properties that should be extracted, e.g.: \"hs_pipeline_stage, hs_ticket_priority\".",
+            "advanced_settings": true
+          },
           "property_objects": {
             "type": "string",
-            "order": 19,
+            "order": 22,
             "title": "Property objects (comma separated)",
             "default": "calls, communication, company, contacts, deals, email, line_item, meeting, notes, postal_mail, product, task, tickets",
             "el_type": "extractor",
@@ -252,7 +273,7 @@
           },
           "properties_as_json_string": {
             "type": "boolean",
-            "order": 20,
+            "order": 23,
             "title": "Properties as JSON string",
             "default": false,
             "el_type": "extractor",
