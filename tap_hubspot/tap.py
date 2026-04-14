@@ -231,13 +231,6 @@ class TapHubspot(Tap):
         """
         streams_list = []
 
-        return [
-            DealStream(self),
-            ContactStream(self),
-            TicketStream(self),
-            NoteStream(self),
-        ]
-
         custom_objects = self.get_custom_objects()
         for custom_object in custom_objects:
             self.user_discovery_logger.info(f"Discovered custom object: {custom_object['object_name']}")
