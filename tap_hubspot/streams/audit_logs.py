@@ -7,7 +7,7 @@ from typing import Any, Generator
 import requests
 from nekt_singer_sdk import typing as th
 from nekt_singer_sdk.custom_logger import user_logger
-from singer_sdk.exceptions import FatalAPIError
+from nekt_singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 from tap_hubspot.client import HubspotStream
 
 PropertiesList = th.PropertiesList
@@ -103,6 +103,14 @@ class AuditLogsStream(HubspotStream):
                     "audit_logs stream is not available: missing 'account-info.security.read' scope. "
                     "This scope requires a HubSpot Enterprise account and re-authorization of the OAuth connection. "
                     "Skipping stream."
+                )
+                return
+            raise
+        except RetriableAPIError as e:
+            if "500" in str(e):
+                user_logger.warning(
+                    f"audit_logs stream returned a 500 Internal Server Error from HubSpot. "
+                    "This is a transient HubSpot-side error. Skipping stream."
                 )
                 return
             raise
