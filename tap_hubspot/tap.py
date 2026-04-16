@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+from functools import cached_property
 
 import requests
 from nekt_singer_sdk import typing as th
@@ -279,8 +280,9 @@ class TapHubspot(Tap):
 
         return streams_list
 
-    def get_custom_objects(self) -> list[dict]:
-        """Get the custom objects from the Hubspot API."""
+    @cached_property
+    def custom_objects(self) -> list[dict]:
+        """Get the custom objects from the Hubspot API (cached for the lifetime of the tap)."""
         endpoint = "https://api.hubapi.com/crm/v3/schemas"
         headers = {
             "Authorization": f"Bearer {self.get_access_token()}",
@@ -301,6 +303,21 @@ class TapHubspot(Tap):
         except Exception as e:
             self.user_discovery_logger.warning(f"Unable to get custom objects: {e}")
             return []
+
+    def get_custom_objects(self) -> list[dict]:
+        """Backwards-compatible accessor for the cached custom objects list."""
+        return self.custom_objects
+
+    @cached_property
+    def custom_object_qualified_name_to_object_type_id(self) -> dict[str, str]:
+        """Map fullyQualifiedName -> objectTypeId for all custom objects.
+
+        HubSpot's `GET /objects/{type}/{id}?associations=2-XXXXX` request accepts the
+        objectTypeId, but the response keys back the associations under the
+        fullyQualifiedName (e.g. `p<portalId>_<object_name>`). This mapping lets us
+        translate the response keys back to the user-facing objectTypeId.
+        """
+        return {co["object_qualified_name"]: co["object_type_id"] for co in self.custom_objects}
 
     def get_access_token(self) -> str:
         """Get the access token from the Hubspot API."""

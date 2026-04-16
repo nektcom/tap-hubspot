@@ -3,7 +3,7 @@ from __future__ import annotations
 from functools import cached_property
 
 from nekt_singer_sdk import typing as th  # JSON Schema typing helpers
-from tap_hubspot.client import DynamicIncrementalHubspotStream
+from tap_hubspot.client import DynamicIncrementalHubspotStream, sanitize_association_key
 
 
 class ContactStream(DynamicIncrementalHubspotStream):
@@ -51,7 +51,7 @@ class ContactStream(DynamicIncrementalHubspotStream):
             for association_string in self.associations_string_list:
                 associations_schema.append(
                     th.Property(
-                        association_string,
+                        sanitize_association_key(association_string),
                         th.ArrayType(
                             th.ObjectType(
                                 th.Property(

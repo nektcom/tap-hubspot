@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from functools import cached_property
 from http import HTTPStatus
@@ -24,6 +25,29 @@ if sys.version_info < (3, 11):
     MonkeyPatch.patch_fromisoformat()
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
+
+# Custom object type IDs follow the pattern "2-XXXXX" (e.g., "2-12345").
+# These are not valid field names in most downstream systems, so we prefix them.
+_CUSTOM_OBJECT_TYPE_ID_PATTERN = re.compile(r"^\d+-\d+$")
+
+
+def sanitize_association_key(key: str, qualified_name_to_object_type_id: dict[str, str] | None = None) -> str:
+    """Normalize an association key to a stable, downstream-safe field name.
+
+    - Custom object type IDs (e.g. '2-12345') are prefixed with 'custom_' and have
+      their hyphens replaced with underscores -> 'custom_2_12345'.
+    - HubSpot returns associations keyed by the object's fullyQualifiedName
+      (e.g. 'p44530090_clientes_rmapp'), which embeds the portal ID and is therefore
+      account-specific. When a mapping from qualified name to objectTypeId is given,
+      such keys are normalized back to the stable 'custom_<objectTypeId>' form.
+    - Standard association names (e.g. 'contacts', 'companies') are returned as-is.
+    """
+    if qualified_name_to_object_type_id and key in qualified_name_to_object_type_id:
+        object_type_id = qualified_name_to_object_type_id[key]
+        return f"custom_{object_type_id.replace('-', '_')}"
+    if _CUSTOM_OBJECT_TYPE_ID_PATTERN.match(key):
+        return f"custom_{key.replace('-', '_')}"
+    return key
 
 
 class HubspotStream(RESTStream):
@@ -452,8 +476,14 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
                 response_payload = response.json()
                 associations_data = response_payload.get("associations", {})
                 property_history_data = response_payload.get("propertiesWithHistory", {})
+                qualified_name_to_object_type_id = getattr(
+                    self._tap, "custom_object_qualified_name_to_object_type_id", None
+                )
                 return {
-                    "associations": {k: v.get("results") for k, v in associations_data.items()},
+                    "associations": {
+                        sanitize_association_key(k, qualified_name_to_object_type_id): v.get("results")
+                        for k, v in associations_data.items()
+                    },
                     "propertiesWithHistory": {k: v for k, v in property_history_data.items()},
                 }
 
