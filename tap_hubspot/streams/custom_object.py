@@ -3,7 +3,6 @@ from __future__ import annotations
 from os import PathLike
 from typing import Any
 
-from nekt_singer_sdk import typing as th  # JSON Schema typing helpers
 from nekt_singer_sdk.singerlib.schema import Schema
 from nekt_singer_sdk.tap_base import Tap
 from tap_hubspot.client import DynamicIncrementalHubspotStream
@@ -11,16 +10,7 @@ from tap_hubspot.client import DynamicIncrementalHubspotStream
 
 class CustomObjectStream(DynamicIncrementalHubspotStream):
     """
-    https://developers.hubspot.com/docs/api/crm/contacts
-    """
-
-    """
-    name: stream name
-    path: path which will be added to api url in client.py
-    schema: instream schema
-    primary_keys = primary keys for the table
-    replication_key = datetime keys for replication
-    records_jsonpath = json response body
+    https://developers.hubspot.com/docs/api/crm/crm-custom-objects
     """
 
     def __init__(
@@ -65,7 +55,12 @@ class CustomObjectStream(DynamicIncrementalHubspotStream):
 
     primary_keys = ["id"]
     replication_key = "hs_lastmodifieddate"
-    records_jsonpath = "$.results[*]"  # Or override `parse_response`.
+    records_jsonpath = "$.results[*]"
+
+    @property
+    def api_object_type(self) -> str:
+        """Custom objects use object_type_id (e.g. '2-12345') in API URLs."""
+        return self.object_type_id
 
     @property
     def url_base(self) -> str:
