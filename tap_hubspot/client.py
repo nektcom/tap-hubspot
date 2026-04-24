@@ -40,6 +40,8 @@ def sanitize_association_key(key: str, qualified_name_to_object_type_id: dict[st
       (e.g. 'p44530090_clientes_rmapp'), which embeds the portal ID and is therefore
       account-specific. When a mapping from qualified name to objectTypeId is given,
       such keys are normalized back to the stable 'custom_<objectTypeId>' form.
+    - The API may return association keys with spaces (e.g. 'line items' instead of
+      'line_items'). Spaces are normalized to underscores.
     - Standard association names (e.g. 'contacts', 'companies') are returned as-is.
     """
     if qualified_name_to_object_type_id and key in qualified_name_to_object_type_id:
@@ -47,7 +49,7 @@ def sanitize_association_key(key: str, qualified_name_to_object_type_id: dict[st
         return f"custom_{object_type_id.replace('-', '_')}"
     if _CUSTOM_OBJECT_TYPE_ID_PATTERN.match(key):
         return f"custom_{key.replace('-', '_')}"
-    return key
+    return key.replace(" ", "_")
 
 
 class HubspotStream(RESTStream):
