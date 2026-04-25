@@ -75,46 +75,17 @@ class TapHubspot(Tap):
             description="Latest record date to sync",
         ),
         th.Property(
-            "extract_deal_associations",
-            th.BooleanType,
-            default=False,
-            required=True,
-            description="Enable the extraction of entities associated with deals",
-        ),
-        th.Property(
-            "extract_deal_associations_comma_separated_string",
-            th.StringType,
+            "associations",
+            th.ArrayType(
+                th.ObjectType(
+                    th.Property("object_name", th.StringType),
+                    th.Property("associations", th.StringType),
+                )
+            ),
             required=False,
-            default="calls, commerce_payments, communications, companies, contacts, deal_split, deals, emails, invoices, line_item, meetings, notes, orders, postal_mail, quotes, services, subscriptions, tasks, tickets",
-            description="Comma separated string with the name of entities that should be extracted",
-        ),
-        th.Property(
-            "extract_contact_associations",
-            th.BooleanType,
-            default=False,
-            required=True,
-            description="Enable the extraction of entities associated with contacts",
-        ),
-        th.Property(
-            "extract_contact_associations_comma_separated_string",
-            th.StringType,
-            required=False,
-            default="calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks, tickets",
-            description="Comma separated string with the name of entities that should be extracted",
-        ),
-        th.Property(
-            "extract_ticket_associations",
-            th.BooleanType,
-            default=False,
-            required=True,
-            description="Enable the extraction of entities associated with tickets",
-        ),
-        th.Property(
-            "extract_ticket_associations_comma_separated_string",
-            th.StringType,
-            required=False,
-            default="calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks",
-            description="Comma separated string with the name of entities that should be extracted",
+            description="Array of objects defining which associations to extract per object type. "
+            'Each element has "object_name" (e.g. "deals", "contacts", or a custom object name) '
+            'and "associations" (comma-separated list of associated entities to extract).',
         ),
         th.Property(
             "extract_ticket_property_history",
@@ -129,48 +100,6 @@ class TapHubspot(Tap):
             required=False,
             default="hs_pipeline_stage,hs_ticket_priority",
             description="Comma separated string with the name of properties that should be extracted with history.",
-        ),
-        th.Property(
-            "extract_lead_associations",
-            th.BooleanType,
-            default=False,
-            required=True,
-            description="Enable the extraction of entities associated with leads",
-        ),
-        th.Property(
-            "extract_lead_associations_comma_separated_string",
-            th.StringType,
-            required=False,
-            default="calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks, tickets",
-            description="Comma separated string with the name of entities that should be extracted",
-        ),
-        th.Property(
-            "extract_company_associations",
-            th.BooleanType,
-            default=False,
-            required=True,
-            description="Enable the extraction of entities associated with companies",
-        ),
-        th.Property(
-            "extract_company_associations_comma_separated_string",
-            th.StringType,
-            required=False,
-            default="calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks",
-            description="Comma separated string with the name of entities that should be extracted",
-        ),
-        th.Property(
-            "extract_email_associations",
-            th.BooleanType,
-            default=False,
-            required=True,
-            description="Enable the extraction of entities associated with emails",
-        ),
-        th.Property(
-            "extract_email_associations_comma_separated_string",
-            th.StringType,
-            required=False,
-            default="companies, contacts, deals, tickets",
-            description="Comma separated string with the name of entities that should be extracted",
         ),
         th.Property(
             "extract_contact_property_history",

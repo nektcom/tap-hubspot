@@ -249,6 +249,10 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
     last_record_id = None
     incremental_path = None
 
+    # Override in subclasses that have legacy per-stream property-history config keys
+    # (e.g. "deal" for extract_deal_property_history).
+    _legacy_config_object_name: str | None = None
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -261,6 +265,45 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
         )
         session.mount("https://", adapter)
         return session
+
+    @property
+    def api_object_type(self) -> str:
+        """Object type identifier used in HubSpot API URLs.
+
+        Standard streams return self.name (e.g. "deals").
+        Custom objects should override this to return their object_type_id.
+        """
+        return self.name
+
+    @cached_property
+    def associations_string_list(self) -> list[str] | None:
+        """Resolve the list of associations to extract for this stream from the unified config."""
+        for entry in self.config.get("associations") or []:
+            if entry.get("object_name") == self.name:
+                value = entry.get("associations", "")
+                if value:
+                    return value.replace(" ", "").split(",")
+        return None
+
+    @cached_property
+    def should_extract_associations(self) -> bool:
+        return bool(self.associations_string_list)
+
+    @cached_property
+    def property_history_string_list(self) -> list[str] | None:
+        """Resolve property history list from legacy config. Returns None when not configured."""
+        if not self._legacy_config_object_name:
+            return None
+        if not self.config.get(f"extract_{self._legacy_config_object_name}_property_history"):
+            return None
+        value = self.config.get(f"extract_{self._legacy_config_object_name}_property_history_comma_separated_string")
+        if not value:
+            return None
+        return value.replace(" ", "").split(",")
+
+    @cached_property
+    def should_extract_property_history(self) -> bool:
+        return bool(self.property_history_string_list)
 
     def _is_incremental_search(self, context):
         return self.replication_key and self.incremental_path is not None
@@ -311,7 +354,43 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
                     description="Timestamp when the record was last updated.",
                 )
             )
-        return schema.to_dict()
+        schema_dict = schema.to_dict()
+
+        if self.should_extract_associations:
+            associations_schema = th.PropertiesList()
+            for assoc in self.associations_string_list:
+                associations_schema.append(
+                    th.Property(
+                        sanitize_association_key(assoc),
+                        th.ArrayType(
+                            th.ObjectType(
+                                th.Property("id", th.StringType, description="Unique identifier of the associated record."),
+                                th.Property("type", th.StringType, description="Type classification of the association."),
+                            )
+                        ),
+                        description="List of associated records.",
+                    )
+                )
+            schema_dict["properties"]["associations"] = associations_schema.to_dict()
+
+        if self.should_extract_property_history:
+            property_history_schema = th.PropertiesList()
+            history_entry_type = th.ArrayType(
+                th.ObjectType(
+                    th.Property("sourceType", th.StringType, description="Type of the change source."),
+                    th.Property("sourceId", th.StringType, description="Identifier of the change source."),
+                    th.Property("updatedByUserId", th.IntegerType, description="Identifier of the user who made the change."),
+                    th.Property("value", th.StringType, description="Value of the property at this change."),
+                    th.Property("timestamp", th.StringType, description="Timestamp when the change occurred."),
+                )
+            )
+            for prop_name in self.property_history_string_list:
+                property_history_schema.append(
+                    th.Property(prop_name, history_entry_type, description="History of changes for this property.")
+                )
+            schema_dict["properties"]["propertiesWithHistory"] = property_history_schema.to_dict()
+
+        return schema_dict
 
     def get_url_params(
         self,
@@ -337,18 +416,22 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
         context: dict | None = None,  # noqa: ARG002
     ) -> dict | None:
         """As needed, append or transform raw data to match expected structure.
-        Optional. This method gives developers an opportunity to "clean up" the results
-        prior to returning records to the downstream tap - for instance: cleaning,
-        renaming, or appending properties to the raw record result returned from the
-        API.
-        Developers may also return `None` from this method to filter out
-        invalid or not-applicable records from the stream.
-        Args:
-            row: Individual record in the stream.
-            context: Stream partition or context dictionary.
-        Returns:
-            The resulting record dict, or `None` if the record should be excluded.
+
+        Handles fetching associations and property history via an additional API
+        call when configured, then applies standard post-processing (replication
+        key extraction, JSON-string conversion).
         """
+        if self.should_extract_associations or self.should_extract_property_history:
+            additional_data = self._fetch_additional_data_with_retry(
+                self.api_object_type,
+                row["id"],
+                self.associations_string_list if self.should_extract_associations else None,
+                self.property_history_string_list if self.should_extract_property_history else None,
+            )
+            if "associations" in additional_data:
+                row["associations"] = additional_data["associations"]
+            if "propertiesWithHistory" in additional_data:
+                row["propertiesWithHistory"] = additional_data["propertiesWithHistory"]
 
         if self.replication_key:
             val = None
