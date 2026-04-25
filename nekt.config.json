@@ -73,27 +73,62 @@
           },
           "associations": {
             "type": "array",
-            "order": 4,
-            "title": "Associations",
-            "el_type": "extractor",
-            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/associations/associations-v4",
-            "description": "Configure which associations to extract per object type (standard or custom). Each entry specifies an object name and a comma-separated list of associated entities. Enable only if necessary, since it significantly increases the extraction time.",
-            "advanced_settings": true,
             "items": {
               "type": "object",
+              "required": [
+                "entity_name",
+                "association_string"
+              ],
               "properties": {
-                "object_name": {
+                "entity_name": {
                   "type": "string",
-                  "title": "Object name",
-                  "description": "The object type name (e.g. 'deals', 'contacts', or a custom object name)."
+                  "order": 1,
+                  "title": "Hubspot entity name",
+                  "format": "dropdown-with-other",
+                  "el_type": "extractor",
+                  "description": "The Hubspot entity name you want to fetch associations for.",
+                  "allowed_values": [
+                    {
+                      "label": "Companies",
+                      "value": "companies"
+                    },
+                    {
+                      "label": "Contacts",
+                      "value": "contacts"
+                    },
+                    {
+                      "label": "Deals",
+                      "value": "deals"
+                    },
+                    {
+                      "label": "Emails",
+                      "value": "emails"
+                    },
+                    {
+                      "label": "Leads",
+                      "value": "leads"
+                    },
+                    {
+                      "label": "Tickets",
+                      "value": "tickets"
+                    }
+                  ]
                 },
-                "associations": {
+                "association_string": {
                   "type": "string",
-                  "title": "Associations (comma separated)",
-                  "description": "Comma-separated list of associated entity names to extract (e.g. 'companies, contacts')."
+                  "order": 2,
+                  "title": "Associations (comma-separated list)",
+                  "el_type": "extractor",
+                  "description": "The object type name (e.g. 'deals', 'contacts', or a custom object ID like 2-12345)."
                 }
               }
-            }
+            },
+            "order": 99,
+            "title": "Associations",
+            "format": "array-form",
+            "el_type": "extractor",
+            "description": "Configure which associations to extract per object type (standard or custom). Each entry specifies an object name and a comma-separated list of associated entities. Enable only if necessary, since it significantly increases the extraction time.",
+            "advanced_settings": true
           },
           "extract_contact_property_history": {
             "type": "boolean",
