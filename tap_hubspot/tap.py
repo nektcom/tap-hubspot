@@ -79,7 +79,7 @@ class TapHubspot(Tap):
             th.ArrayType(
                 th.ObjectType(
                     th.Property("object_name", th.StringType),
-                    th.Property("associations", th.StringType),
+                    th.Property("association_string", th.StringType),
                 )
             ),
             required=False,

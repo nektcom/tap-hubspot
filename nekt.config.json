@@ -76,11 +76,11 @@
             "items": {
               "type": "object",
               "required": [
-                "entity_name",
+                "object_name",
                 "association_string"
               ],
               "properties": {
-                "entity_name": {
+                "object_name": {
                   "type": "string",
                   "order": 1,
                   "title": "Hubspot entity name",

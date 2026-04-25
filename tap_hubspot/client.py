@@ -280,7 +280,7 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
         """Resolve the list of associations to extract for this stream from the unified config."""
         for entry in self.config.get("associations") or []:
             if entry.get("object_name") == self.name:
-                value = entry.get("associations", "")
+                value = entry.get("association_string", "")
                 if value:
                     return value.replace(" ", "").split(",")
         return None
@@ -364,8 +364,12 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
                         sanitize_association_key(assoc),
                         th.ArrayType(
                             th.ObjectType(
-                                th.Property("id", th.StringType, description="Unique identifier of the associated record."),
-                                th.Property("type", th.StringType, description="Type classification of the association."),
+                                th.Property(
+                                    "id", th.StringType, description="Unique identifier of the associated record."
+                                ),
+                                th.Property(
+                                    "type", th.StringType, description="Type classification of the association."
+                                ),
                             )
                         ),
                         description="List of associated records.",
@@ -379,7 +383,9 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
                 th.ObjectType(
                     th.Property("sourceType", th.StringType, description="Type of the change source."),
                     th.Property("sourceId", th.StringType, description="Identifier of the change source."),
-                    th.Property("updatedByUserId", th.IntegerType, description="Identifier of the user who made the change."),
+                    th.Property(
+                        "updatedByUserId", th.IntegerType, description="Identifier of the user who made the change."
+                    ),
                     th.Property("value", th.StringType, description="Value of the property at this change."),
                     th.Property("timestamp", th.StringType, description="Timestamp when the change occurred."),
                 )
