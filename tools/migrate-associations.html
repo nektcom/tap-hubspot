@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tap-hubspot: Associations Config Migration</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #1a1a1a; padding: 2rem; }
+  h1 { font-size: 1.4rem; margin-bottom: 0.3rem; }
+  .subtitle { color: #666; font-size: 0.9rem; margin-bottom: 1.5rem; }
+  .container { max-width: 960px; margin: 0 auto; }
+  .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+  .panel { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem; }
+  .panel h2 { font-size: 0.95rem; margin-bottom: 0.5rem; color: #333; }
+  .panel p { font-size: 0.8rem; color: #888; margin-bottom: 0.75rem; }
+  textarea { width: 100%; height: 320px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.82rem; border: 1px solid #ccc; border-radius: 6px; padding: 0.75rem; resize: vertical; tab-size: 2; background: #fafafa; }
+  textarea:focus { outline: none; border-color: #4a90d9; box-shadow: 0 0 0 2px rgba(74,144,217,0.15); }
+  .output-area { background: #f0f4f8; }
+  .actions { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1.5rem; }
+  button { padding: 0.5rem 1.2rem; font-size: 0.85rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: background 0.15s; }
+  .btn-primary { background: #4a90d9; color: #fff; }
+  .btn-primary:hover { background: #3a7bc8; }
+  .btn-secondary { background: #e8e8e8; color: #333; }
+  .btn-secondary:hover { background: #ddd; }
+  .status { font-size: 0.82rem; color: #666; }
+  .status.error { color: #c0392b; }
+  .status.success { color: #27ae60; }
+  .info-box { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+  .info-box h3 { font-size: 0.9rem; margin-bottom: 0.5rem; }
+  .info-box pre { font-size: 0.78rem; background: #f8f8f8; padding: 0.75rem; border-radius: 4px; overflow-x: auto; line-height: 1.5; }
+  .info-box code { font-family: 'SF Mono', 'Fira Code', monospace; }
+  .detected { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+  .detected h3 { font-size: 0.9rem; margin-bottom: 0.5rem; }
+  .detected-list { list-style: none; padding: 0; }
+  .detected-list li { font-size: 0.82rem; padding: 0.3rem 0; display: flex; align-items: center; gap: 0.5rem; }
+  .detected-list .dot { width: 8px; height: 8px; border-radius: 50%; background: #27ae60; display: inline-block; flex-shrink: 0; }
+  .detected-list .dot.inactive { background: #ccc; }
+  .detected-list .entities { color: #666; font-size: 0.78rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>tap-hubspot: Associations Config Migration</h1>
+  <p class="subtitle">Convert legacy per-object association configs to the new unified <code>associations</code> array format.</p>
+
+  <div class="info-box">
+    <h3>New format</h3>
+    <pre><code>"associations": [
+  { "object_name": "deals", "associations": "companies, contacts" },
+  { "object_name": "contacts", "associations": "companies, deals" },
+  { "object_name": "my_custom_object", "associations": "contacts, companies" }
+]</code></pre>
+  </div>
+
+  <div class="panels">
+    <div class="panel">
+      <h2>Old config (paste full JSON)</h2>
+      <p>Your existing config with extract_*_associations keys</p>
+      <textarea id="input" spellcheck="false" placeholder='{
+  "start_date": "2025-01-01",
+  "extract_deal_associations": true,
+  "extract_deal_associations_comma_separated_string": "companies, contacts",
+  "extract_contact_associations": true,
+  "extract_contact_associations_comma_separated_string": "companies, deals",
+  ...
+}'></textarea>
+    </div>
+    <div class="panel">
+      <h2>New config (migrated)</h2>
+      <p>Ready to use with the refactored tap-hubspot</p>
+      <textarea id="output" class="output-area" spellcheck="false" readonly placeholder="Click 'Migrate' to convert..."></textarea>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-primary" onclick="migrate()">Migrate</button>
+    <button class="btn-secondary" onclick="copyOutput()">Copy output</button>
+    <span id="status" class="status"></span>
+  </div>
+
+  <div id="detected" class="detected" style="display:none">
+    <h3>Detected associations</h3>
+    <ul id="detected-list" class="detected-list"></ul>
+  </div>
+</div>
+
+<script>
+const OBJECT_MAP = {
+  deal:    { name: 'deals',     default_entities: 'calls, commerce_payments, communications, companies, contacts, deal_split, deals, emails, invoices, line_item, meetings, notes, orders, postal_mail, quotes, services, subscriptions, tasks, tickets' },
+  contact: { name: 'contacts',  default_entities: 'calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks, tickets' },
+  ticket:  { name: 'tickets',   default_entities: 'calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks' },
+  lead:    { name: 'leads',     default_entities: 'calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks, tickets' },
+  company: { name: 'companies', default_entities: 'calls, communications, companies, contacts, emails, meetings, notes, subscriptions, tasks' },
+  email:   { name: 'emails',    default_entities: 'companies, contacts, deals, tickets' },
+};
+
+const LEGACY_KEYS = [];
+for (const prefix of Object.keys(OBJECT_MAP)) {
+  LEGACY_KEYS.push(`extract_${prefix}_associations`);
+  LEGACY_KEYS.push(`extract_${prefix}_associations_comma_separated_string`);
+}
+
+function setStatus(msg, type) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status' + (type ? ' ' + type : '');
+}
+
+function migrate() {
+  const input = document.getElementById('input').value.trim();
+  if (!input) { setStatus('Paste your old config first.', 'error'); return; }
+
+  let config;
+  try {
+    config = JSON.parse(input);
+  } catch (e) {
+    setStatus('Invalid JSON: ' + e.message, 'error');
+    return;
+  }
+
+  const associations = [];
+  const detectedItems = [];
+
+  for (const [prefix, info] of Object.entries(OBJECT_MAP)) {
+    const enableKey = `extract_${prefix}_associations`;
+    const listKey = `extract_${prefix}_associations_comma_separated_string`;
+    const enabled = config[enableKey] === true;
+    const entities = config[listKey] || info.default_entities;
+
+    detectedItems.push({
+      name: info.name,
+      enabled,
+      entities: entities,
+    });
+
+    if (enabled) {
+      associations.push({
+        object_name: info.name,
+        associations: entities,
+      });
+    }
+  }
+
+  // Build new config: copy everything except legacy keys, inject associations array
+  const newConfig = {};
+  for (const [key, value] of Object.entries(config)) {
+    if (LEGACY_KEYS.includes(key)) continue;
+    if (key === 'associations') continue; // remove any existing associations key
+    newConfig[key] = value;
+  }
+
+  if (associations.length > 0) {
+    newConfig.associations = associations;
+  }
+
+  // Render output
+  document.getElementById('output').value = JSON.stringify(newConfig, null, 2);
+
+  // Render detected list
+  const listEl = document.getElementById('detected-list');
+  listEl.innerHTML = '';
+  for (const item of detectedItems) {
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="dot ${item.enabled ? '' : 'inactive'}"></span>
+      <strong>${item.name}</strong>
+      ${item.enabled ? '<span class="entities">' + item.entities + '</span>' : '<span class="entities" style="color:#aaa">disabled</span>'}`;
+    listEl.appendChild(li);
+  }
+  document.getElementById('detected').style.display = 'block';
+
+  const enabledCount = associations.length;
+  setStatus(`Migrated ${enabledCount} association config${enabledCount !== 1 ? 's' : ''}, removed ${LEGACY_KEYS.length} legacy keys.`, 'success');
+}
+
+function copyOutput() {
+  const output = document.getElementById('output');
+  if (!output.value) { setStatus('Nothing to copy yet.', 'error'); return; }
+  navigator.clipboard.writeText(output.value).then(() => {
+    setStatus('Copied to clipboard.', 'success');
+  });
+}
+
+// Auto-migrate on paste
+document.getElementById('input').addEventListener('paste', () => {
+  setTimeout(migrate, 50);
+});
+</script>
+</body>
+</html>
