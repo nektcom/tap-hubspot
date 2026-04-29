@@ -30,6 +30,25 @@ _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 # These are not valid field names in most downstream systems, so we prefix them.
 _CUSTOM_OBJECT_TYPE_ID_PATTERN = re.compile(r"^\d+-\d+$")
 
+# Matches any character that is NOT alphanumeric or underscore (i.e. invalid for
+# downstream column names in BigQuery and most other warehouses).
+_INVALID_FIELD_CHAR_PATTERN = re.compile(r"[^a-zA-Z0-9_]")
+
+
+def sanitize_field_name(name: str) -> str:
+    """Normalize a HubSpot property name to a valid downstream field name.
+
+    - Non-alphanumeric/underscore characters are replaced with underscores.
+    - Consecutive underscores are preserved to avoid collisions between
+      properties whose original names differ only in the number of special chars.
+    - Names that start with a digit are prefixed with an underscore.
+    - Names are truncated to 300 characters (BigQuery limit).
+    """
+    sanitized = _INVALID_FIELD_CHAR_PATTERN.sub("_", name)
+    if sanitized and sanitized[0].isdigit():
+        sanitized = f"_{sanitized}"
+    return sanitized[:300] if sanitized else "_unknown"
+
 
 def sanitize_association_key(key: str, qualified_name_to_object_type_id: dict[str, str] | None = None) -> str:
     """Normalize an association key to a stable, downstream-safe field name.
@@ -162,6 +181,18 @@ class DynamicHubspotStream(HubspotStream):
         return self.config.get("properties_as_json_string", False)
 
     @cached_property
+    def _property_name_map(self) -> dict[str, str]:
+        """Mapping from original HubSpot property name to sanitized field name.
+
+        Only contains entries where the name actually changed.
+        """
+        return {
+            orig: sanitized
+            for orig in self.hs_properties
+            if (sanitized := sanitize_field_name(orig)) != orig
+        }
+
+    @cached_property
     def schema(self) -> dict:
         """Return a draft JSON schema for this stream."""
         self.hs_properties = self._get_available_properties()
@@ -169,7 +200,10 @@ class DynamicHubspotStream(HubspotStream):
         if self._properties_as_json_string:
             properties_type = th.StringType
         else:
-            hs_props = [th.Property(name, self._get_datatype(type)) for name, type in self.hs_properties.items()]
+            hs_props = [
+                th.Property(sanitize_field_name(name), self._get_datatype(type))
+                for name, type in self.hs_properties.items()
+            ]
             properties_type = th.ObjectType(*hs_props)
 
         schema = th.PropertiesList(
@@ -201,13 +235,21 @@ class DynamicHubspotStream(HubspotStream):
         )
         return schema.to_dict()
 
+    def _sanitize_property_keys(self, properties: dict) -> dict:
+        """Remap property keys from original HubSpot names to sanitized field names."""
+        if not self._property_name_map:
+            return properties
+        return {self._property_name_map.get(k, k): v for k, v in properties.items()}
+
     def post_process(
         self,
         row: dict,
         context: dict | None = None,
     ) -> dict | None:
-        if self._properties_as_json_string and isinstance(row.get("properties"), dict):
-            row["properties"] = json.dumps(row["properties"])
+        if isinstance(row.get("properties"), dict):
+            row["properties"] = self._sanitize_property_keys(row["properties"])
+            if self._properties_as_json_string:
+                row["properties"] = json.dumps(row["properties"])
         return row
 
     def _get_available_properties(self) -> dict[str, str]:
@@ -316,7 +358,10 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
         if self._properties_as_json_string:
             properties_type = th.StringType
         else:
-            hs_props = [th.Property(name, self._get_datatype(type)) for name, type in self.hs_properties.items()]
+            hs_props = [
+                th.Property(sanitize_field_name(name), self._get_datatype(type))
+                for name, type in self.hs_properties.items()
+            ]
             properties_type = th.ObjectType(*hs_props)
 
         schema = th.PropertiesList(
@@ -446,8 +491,10 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
             row[self.replication_key] = val
         self.last_record_id = row.get("id")
 
-        if self._properties_as_json_string and isinstance(row.get("properties"), dict):
-            row["properties"] = json.dumps(row["properties"])
+        if isinstance(row.get("properties"), dict):
+            row["properties"] = self._sanitize_property_keys(row["properties"])
+            if self._properties_as_json_string:
+                row["properties"] = json.dumps(row["properties"])
 
         return row
 
