@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any, Iterable
+
 from nekt_singer_sdk import typing as th  # JSON Schema typing helpers
 from tap_hubspot.client import HubspotStream
 
@@ -22,6 +24,9 @@ class OwnersStream(HubspotStream):
     path = "/owners"
     primary_keys = ["id"]
     records_jsonpath = "$[results][*]"  # Or override `parse_response`.
+
+    # Tracks whether we are currently fetching archived owners.
+    _fetch_archived: bool = False
 
     schema = th.PropertiesList(
         th.Property(
@@ -72,3 +77,21 @@ class OwnersStream(HubspotStream):
         Returns an updated path which includes the api version
         """
         return "https://api.hubapi.com/crm/v3"
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        params = super().get_url_params(context, next_page_token)
+        if self._fetch_archived:
+            params["archived"] = "true"
+        return params
+
+    def request_records(self, context: dict | None) -> Iterable[dict]:
+        """Fetch non-archived owners first, then archived owners."""
+        self._fetch_archived = False
+        yield from super().request_records(context)
+
+        self._fetch_archived = True
+        yield from super().request_records(context)
