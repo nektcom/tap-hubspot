@@ -89,6 +89,14 @@
                   "description": "The Hubspot entity name you want to fetch associations for.",
                   "allowed_values": [
                     {
+                      "label": "Calls",
+                      "value": "calls"
+                    },
+                    {
+                      "label": "Communication",
+                      "value": "communication"
+                    },
+                    {
                       "label": "Companies",
                       "value": "companies"
                     },
@@ -107,6 +115,22 @@
                     {
                       "label": "Leads",
                       "value": "leads"
+                    },
+                    {
+                      "label": "Meetings",
+                      "value": "meetings"
+                    },
+                    {
+                      "label": "Notes",
+                      "value": "notes"
+                    },
+                    {
+                      "label": "Postal Mail",
+                      "value": "postal_mail"
+                    },
+                    {
+                      "label": "Tasks",
+                      "value": "tasks"
                     },
                     {
                       "label": "Tickets",
