@@ -6,6 +6,7 @@ from .contacts import ContactStream
 from .custom_object import CustomObjectStream
 from .deal_pipelines import DealPipelineStream
 from .deals import DealStream
+from .deals_archived import ArchivedDealStream
 from .email_subscription import EmailSubscriptionStream
 from .emails import EmailStream
 from .feedback_submission import FeedbackSubmissionsStream

@@ -11,6 +11,7 @@ from nekt_singer_sdk.custom_logger import user_logger
 from nekt_singer_sdk.tap_base import Tap
 from tap_hubspot.client import HubspotStream
 from tap_hubspot.streams import (
+    ArchivedDealStream,
     AuditLogsStream,
     CallStream,
     CommunicationStream,
@@ -187,6 +188,7 @@ class TapHubspot(Tap):
                 PropertiesStream(self),
                 CompanyStream(self),
                 DealStream(self),
+                ArchivedDealStream(self),
                 # FeedbackSubmissionsStream(self),
                 LineItemStream(self),
                 ProductStream(self),
