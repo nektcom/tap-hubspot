@@ -198,7 +198,7 @@
           },
           "extract_ticket_property_history": {
             "type": "boolean",
-            "order": 9,
+            "order": 11,
             "title": "Extract ticket properties history",
             "default": false,
             "el_type": "extractor",
@@ -208,7 +208,7 @@
           },
           "extract_ticket_property_history_comma_separated_string": {
             "type": "string",
-            "order": 10,
+            "order": 12,
             "title": "Ticket properties history (comma separated)",
             "default": "hs_pipeline_stage,hs_ticket_priority",
             "el_type": "extractor",
@@ -217,9 +217,30 @@
             "description": "Comma separated list with the name of the properties that should be extracted, e.g.: \"hs_pipeline_stage, hs_ticket_priority\".",
             "advanced_settings": true
           },
+          "extract_company_property_history": {
+            "type": "boolean",
+            "order": 9,
+            "title": "Extract company properties history",
+            "default": false,
+            "el_type": "extractor",
+            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/objects/companies#retrieve-companies",
+            "description": "Enable the extraction of properties history for companies. Enable only if necessary, since it significantly increases the extraction time.",
+            "advanced_settings": true
+          },
+          "extract_company_property_history_comma_separated_string": {
+            "type": "string",
+            "order": 10,
+            "title": "Company properties history (comma separated)",
+            "default": "name",
+            "el_type": "extractor",
+            "docs_url": "https://developers.hubspot.com/docs/guides/api/crm/objects/companies#retrieve-companies",
+            "dependent": "extract_company_property_history",
+            "description": "Comma separated list with the name of the properties that should be extracted, e.g.: \"name, domain\".",
+            "advanced_settings": true
+          },
           "property_objects": {
             "type": "string",
-            "order": 11,
+            "order": 13,
             "title": "Property objects (comma separated)",
             "default": "calls, communication, company, contacts, deals, email, line_item, meeting, notes, postal_mail, product, task, tickets",
             "el_type": "extractor",
@@ -229,7 +250,7 @@
           },
           "properties_as_json_string": {
             "type": "boolean",
-            "order": 12,
+            "order": 14,
             "title": "Properties as JSON string",
             "default": false,
             "el_type": "extractor",

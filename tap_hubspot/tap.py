@@ -131,6 +131,20 @@ class TapHubspot(Tap):
             description="Comma separated string with the name of properties that should be extracted with history.",
         ),
         th.Property(
+            "extract_company_property_history",
+            th.BooleanType,
+            default=False,
+            required=True,
+            description="Enable the extraction of property history for companies",
+        ),
+        th.Property(
+            "extract_company_property_history_comma_separated_string",
+            th.StringType,
+            required=False,
+            default="name",
+            description="Comma separated string with the name of properties that should be extracted with history.",
+        ),
+        th.Property(
             "enable_leads_stream",
             th.BooleanType,
             default=False,
