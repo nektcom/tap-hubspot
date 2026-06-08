@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import time
 from functools import cached_property
 from http import HTTPStatus
 from typing import Any, Callable
@@ -579,15 +580,43 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
                 }
 
             except requests.exceptions.HTTPError as e:
-                if e.response.status_code == HTTPStatus.UNAUTHORIZED and attempt < max_retries - 1:
+                status_code = e.response.status_code
+                is_last_attempt = attempt >= max_retries - 1
+
+                if status_code == HTTPStatus.UNAUTHORIZED and not is_last_attempt:
                     user_logger.warning(
                         f"Token expired while fetching additional data for {object_type} {record_id}, refreshing token and retrying."
                     )
                     if hasattr(self.authenticator, "update_access_token"):
                         self.authenticator.update_access_token()
                     continue
+
+                # 429 = HubSpot rate limit. Retry returning {} here would silently drop
+                # associations/propertiesWithHistory for this record (e.g. deal 59827085596).
+                # 5xx = transient server errors — also worth retrying.
+                if (status_code == HTTPStatus.TOO_MANY_REQUESTS or status_code >= 500) and not is_last_attempt:
+                    delay = self._retry_delay_seconds(e.response, attempt)
+                    user_logger.warning(
+                        f"HubSpot returned {status_code} fetching additional data for {object_type} {record_id}; "
+                        f"retrying in {delay:.1f}s (attempt {attempt + 1}/{max_retries})."
+                    )
+                    time.sleep(delay)
+                    continue
+
                 user_logger.warning(f"Failed to fetch additional data for {object_type} {record_id}: {e}")
                 return {}
             except requests.exceptions.RequestException as e:
                 user_logger.warning(f"Failed to fetch additional data for {object_type} {record_id}: {e}")
                 return {}
+
+    @staticmethod
+    def _retry_delay_seconds(response: requests.Response, attempt: int) -> float:
+        """Honor HubSpot's Retry-After header when present; fall back to exponential backoff."""
+        retry_after = response.headers.get("Retry-After")
+        if retry_after:
+            try:
+                return max(float(retry_after), 1.0)
+            except ValueError:
+                pass
+        # Exponential backoff: 2s, 4s, 8s, 16s
+        return min(2 ** (attempt + 1), 30.0)
