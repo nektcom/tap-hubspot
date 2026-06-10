@@ -9,7 +9,7 @@ import requests
 from nekt_singer_sdk import typing as th
 from nekt_singer_sdk.custom_logger import user_logger
 from nekt_singer_sdk.tap_base import Tap
-from tap_hubspot.client import HubspotStream
+from tap_hubspot.client import HubspotStream, uses_private_app_token
 from tap_hubspot.streams import (
     ArchivedDealStream,
     AuditLogsStream,
@@ -50,10 +50,17 @@ class TapHubspot(Tap):
 
     config_jsonschema = th.PropertiesList(
         th.Property(
+            "auth_mode",
+            th.StringType,
+            default="oauth",
+            required=False,
+            description="Authentication mode: 'oauth' (OAuth credentials) or 'private_app_token' (a HubSpot private app access token).",
+        ),
+        th.Property(
             "access_token",
             th.StringType,
             required=False,
-            description="Token to authenticate against the API service",
+            description="Access token of a HubSpot private app, used as a Bearer token (auth_mode 'private_app_token').",
         ),
         th.Property(
             "oauth_credentials",
@@ -266,7 +273,7 @@ class TapHubspot(Tap):
 
     def get_access_token(self) -> str:
         """Get the access token from the Hubspot API."""
-        if self.config.get("access_token"):
+        if uses_private_app_token(self.config):
             return self.config["access_token"]
 
         auth_url = "https://api.hubapi.com/oauth/v1/token"

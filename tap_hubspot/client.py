@@ -27,6 +27,23 @@ if sys.version_info < (3, 11):
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 
+
+def uses_private_app_token(config: dict) -> bool:
+    """Decide whether to authenticate with a static private app token (Bearer) vs OAuth.
+
+    Honors the explicit ``auth_mode`` selector when present. When it is absent (connections
+    created before ``auth_mode`` existed), it falls back to detecting which credentials are
+    configured so those keep working: an ``access_token`` without an OAuth ``refresh_token``
+    means a private app token.
+    """
+    auth_mode = config.get("auth_mode")
+    if auth_mode == "private_app_token":
+        return True
+    if auth_mode == "oauth":
+        return False
+    return bool(config.get("access_token")) and "refresh_token" not in config.get("oauth_credentials", {})
+
+
 # Custom object type IDs follow the pattern "2-XXXXX" (e.g., "2-12345").
 # These are not valid field names in most downstream systems, so we prefix them.
 _CUSTOM_OBJECT_TYPE_ID_PATTERN = re.compile(r"^\d+-\d+$")
@@ -75,16 +92,16 @@ class HubspotStream(RESTStream):
             An authenticator instance.
         """
 
-        if "refresh_token" in self.config.get("oauth_credentials", {}):
+        if uses_private_app_token(self.config):
+            return BearerTokenAuthenticator(
+                self,
+                token=self.config.get("access_token"),
+            )
+        else:
             return HubSpotOAuthAuthenticator(
                 self,
                 auth_endpoint="https://api.hubapi.com/oauth/v1/token",
                 default_expiration=1800,
-            )
-        else:
-            return BearerTokenAuthenticator(
-                self,
-                token=self.config.get("access_token"),
             )
 
     @property

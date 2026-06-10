@@ -17,22 +17,55 @@
       "config_template": {
         "type": "object",
         "required": [
-          "oauth_credentials",
+          "auth_mode",
           "start_date"
         ],
         "properties": {
+          "auth_mode": {
+            "enum": [
+              "oauth",
+              "private_app_token"
+            ],
+            "type": "string",
+            "order": 1,
+            "title": "Authentication mode",
+            "format": "dropdown",
+            "default": "oauth",
+            "description": "The authentication mode to use. Choose OAuth or a HubSpot private app token.",
+            "allowed_values": [
+              {
+                "label": "OAuth",
+                "value": "oauth"
+              },
+              {
+                "label": "Private App Token",
+                "value": "private_app_token"
+              }
+            ]
+          },
           "access_token": {
             "type": "string",
-            "title": "Access token",
-            "hidden": true,
-            "el_type": "extractor"
+            "order": 2,
+            "title": "Private App Token",
+            "format": "password",
+            "secret": true,
+            "el_type": "extractor",
+            "dependent": "auth_mode",
+            "description": "The access token of a HubSpot private app (Settings > Integrations > Private Apps > Auth tab). Used as a Bearer token.",
+            "dependent_allowed_values": [
+              "private_app_token"
+            ]
           },
           "oauth_credentials": {
             "type": "object",
-            "order": 1,
+            "order": 2,
             "title": "Access credentials",
             "format": "hubspot-oauth",
             "el_type": "extractor",
+            "dependent": "auth_mode",
+            "dependent_allowed_values": [
+              "oauth"
+            ],
             "properties": {
               "client_id": {
                 "type": "string",
@@ -56,7 +89,7 @@
           },
           "start_date": {
             "type": "string",
-            "order": 2,
+            "order": 3,
             "title": "Start date",
             "format": "date",
             "el_type": "extractor",
@@ -64,7 +97,7 @@
           },
           "enable_leads_stream": {
             "type": "boolean",
-            "order": 3,
+            "order": 4,
             "title": "Enable Leads stream",
             "default": false,
             "el_type": "extractor",
