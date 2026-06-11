@@ -20,7 +20,7 @@ license = "Apache-2.0"
 license-files = [ "LICENSE" ]
 requires-python = ">=3.11"
 dependencies = [
-    "nekt-singer-sdk @ git+https://github.com/nektcom/singer-sdk.git@v0.3.0",
+    "nekt-singer-sdk @ git+https://github.com/nektcom/singer-sdk.git@v0.3.6",
     "pendulum>=3.1.0",
     "ratelimit~=2.2.1",
     "requests~=2.32.3",
