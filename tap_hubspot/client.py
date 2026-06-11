@@ -31,17 +31,20 @@ _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 def uses_private_app_token(config: dict) -> bool:
     """Decide whether to authenticate with a static private app token (Bearer) vs OAuth.
 
-    Honors the explicit ``auth_mode`` selector when present. When it is absent (connections
-    created before ``auth_mode`` existed), it falls back to detecting which credentials are
-    configured so those keep working: an ``access_token`` without an OAuth ``refresh_token``
-    means a private app token.
+    Selection is driven by the credentials actually present, so it stays correct even when
+    the ``auth_mode`` selector is not propagated to the tap (e.g. not declared as a meltano
+    setting, in which case ``auth_mode`` falls back to its ``"oauth"`` schema default): an
+    ``access_token`` without an OAuth ``refresh_token`` means a private app token, while a
+    ``refresh_token`` means OAuth. ``auth_mode`` is only used as a tiebreaker when neither
+    credential is present.
     """
-    auth_mode = config.get("auth_mode")
-    if auth_mode == "private_app_token":
+    has_oauth = "refresh_token" in config.get("oauth_credentials", {})
+    has_token = bool(config.get("access_token"))
+    if has_token and not has_oauth:
         return True
-    if auth_mode == "oauth":
+    if has_oauth:
         return False
-    return bool(config.get("access_token")) and "refresh_token" not in config.get("oauth_credentials", {})
+    return config.get("auth_mode") == "private_app_token"
 
 
 # Custom object type IDs follow the pattern "2-XXXXX" (e.g., "2-12345").
