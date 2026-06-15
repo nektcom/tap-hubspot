@@ -35,7 +35,7 @@
             "description": "The authentication mode to use. Choose OAuth or a HubSpot private app token.",
             "allowed_values": [
               {
-                "label": "OAuth",
+                "label": "Sign in with Hubspot",
                 "value": "oauth"
               },
               {
@@ -60,7 +60,7 @@
           "oauth_credentials": {
             "type": "object",
             "order": 2,
-            "title": "Access credentials",
+            "title": "Sign in with Hubspot",
             "format": "hubspot-oauth",
             "el_type": "extractor",
             "dependent": "auth_mode",
