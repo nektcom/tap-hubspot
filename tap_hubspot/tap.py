@@ -9,7 +9,7 @@ import requests
 from nekt_singer_sdk import typing as th
 from nekt_singer_sdk.custom_logger import user_logger
 from nekt_singer_sdk.tap_base import Tap
-from tap_hubspot.client import HubspotStream, uses_private_app_token
+from tap_hubspot.client import DynamicHubspotStream, HubspotStream, uses_private_app_token
 from tap_hubspot.streams import (
     ArchivedDealStream,
     AuditLogsStream,
@@ -230,7 +230,29 @@ class TapHubspot(Tap):
             ]
         )
 
-        return streams_list
+        return self._probe_streams(streams_list)
+
+    def _probe_streams(self, streams: list[HubspotStream]) -> list[HubspotStream]:
+        """Filter out dynamic streams whose token scopes are insufficient.
+
+        For each stream that builds its schema via a live API call (all
+        DynamicHubspotStream subclasses), we trigger the schema access here so
+        that a 403 is caught gracefully instead of aborting discovery.
+        Streams whose properties endpoint returns 403 are skipped with a warning.
+        """
+        discovered = []
+        for stream in streams:
+            if isinstance(stream, DynamicHubspotStream):
+                try:
+                    _ = stream.schema  # triggers _get_available_properties()
+                    discovered.append(stream)
+                except PermissionError as e:
+                    user_logger.warning(
+                        f"Skipping stream '{stream.name}' — {e}"
+                    )
+            else:
+                discovered.append(stream)
+        return discovered
 
     @cached_property
     def custom_objects(self) -> list[dict]:

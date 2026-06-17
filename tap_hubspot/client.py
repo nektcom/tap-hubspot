@@ -238,6 +238,11 @@ class DynamicHubspotStream(HubspotStream):
         resp = session.get(
             f"https://api.hubapi.com/crm/v3/properties/{self.properties_path}",
         )
+        if resp.status_code == 403:
+            raise PermissionError(
+                f"Token lacks access to '{self.properties_path}' object type. "
+                "Check the Private App Token scopes in HubSpot."
+            )
         resp.raise_for_status()
         results = resp.json().get("results", [])
         return {prop["name"]: prop["type"] for prop in results}
