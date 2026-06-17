@@ -23,6 +23,7 @@ from .postal_mail import PostalMailStream
 from .products import ProductStream
 from .properties import PropertiesStream
 from .quotes import QuoteStream
+from .services import ServiceStream
 from .tasks import TaskStream
 from .ticket_pipelines import TicketPipelineStream
 from .tickets import TicketStream

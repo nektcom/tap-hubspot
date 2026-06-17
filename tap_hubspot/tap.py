@@ -36,6 +36,7 @@ from tap_hubspot.streams import (
     ProductStream,
     PropertiesStream,
     QuoteStream,
+    ServiceStream,
     TaskStream,
     TicketPipelineStream,
     TicketStream,
@@ -197,6 +198,15 @@ class TapHubspot(Tap):
 
         if self.config.get("enable_leads_stream"):
             streams_list.append(LeadsStream(self))
+
+        # "services" is a newer HubSpot standard object (objectTypeId 0-162) that must be
+        # activated in the account and granted via token scope. Its dynamic schema is fetched
+        # eagerly in the stream's __init__, so a missing scope raises a 403 there (before
+        # _probe_streams runs). Guard the instantiation so accounts without it aren't broken.
+        try:
+            streams_list.append(ServiceStream(self))
+        except PermissionError as e:
+            self.user_discovery_logger.info(f"Skipping 'services' stream — {e}")
 
         streams_list.extend(
             [
