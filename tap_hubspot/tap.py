@@ -9,7 +9,7 @@ import requests
 from nekt_singer_sdk import typing as th
 from nekt_singer_sdk.custom_logger import user_logger
 from nekt_singer_sdk.tap_base import Tap
-from tap_hubspot.client import DynamicHubspotStream, HubspotStream, uses_private_app_token
+from tap_hubspot.client import HubspotStream, uses_private_app_token
 from tap_hubspot.streams import (
     ArchivedDealStream,
     ArchivedTaskStream,
@@ -198,73 +198,59 @@ class TapHubspot(Tap):
             )
 
         if self.config.get("enable_leads_stream"):
-            streams_list.append(LeadsStream(self))
-
-        # "services" is a newer HubSpot standard object (objectTypeId 0-162) that must be
-        # activated in the account and granted via token scope. Its dynamic schema is fetched
-        # eagerly in the stream's __init__, so a missing scope raises a 403 there (before
-        # _probe_streams runs). Guard the instantiation so accounts without it aren't broken.
-        try:
-            streams_list.append(ServiceStream(self))
-        except PermissionError as e:
-            self.user_discovery_logger.info(f"Skipping 'services' stream — {e}")
+            streams_list.extend(self._safe_streams(LeadsStream))
 
         streams_list.extend(
-            [
-                ContactStream(self),
-                UsersStream(self),
-                OwnersStream(self),
-                TicketPipelineStream(self),
-                DealPipelineStream(self),
-                # EmailSubscriptionStream(self),
-                PropertiesStream(self),
-                CompanyStream(self),
-                DealStream(self),
-                ArchivedDealStream(self),
-                # FeedbackSubmissionsStream(self),
-                LineItemStream(self),
-                ProductStream(self),
-                TicketStream(self),
-                QuoteStream(self),
-                # GoalStream(self),
-                CallStream(self),
-                CommunicationStream(self),
-                EmailStream(self),
-                MeetingStream(self),
-                NoteStream(self),
-                PostalMailStream(self),
-                TaskStream(self),
-                ArchivedTaskStream(self),
-                FormsStream(self),
-                FormSubmissionsStream(self),
-                MarketingEmailStream(self),
-                AuditLogsStream(self),
-            ]
+            self._safe_streams(
+                ServiceStream,
+                ContactStream,
+                UsersStream,
+                OwnersStream,
+                TicketPipelineStream,
+                DealPipelineStream,
+                # EmailSubscriptionStream,
+                PropertiesStream,
+                CompanyStream,
+                DealStream,
+                ArchivedDealStream,
+                # FeedbackSubmissionsStream,
+                LineItemStream,
+                ProductStream,
+                TicketStream,
+                QuoteStream,
+                # GoalStream,
+                CallStream,
+                CommunicationStream,
+                EmailStream,
+                MeetingStream,
+                NoteStream,
+                PostalMailStream,
+                TaskStream,
+                ArchivedTaskStream,
+                FormsStream,
+                FormSubmissionsStream,
+                MarketingEmailStream,
+                AuditLogsStream,
+            )
         )
 
-        return self._probe_streams(streams_list)
+        return streams_list
 
-    def _probe_streams(self, streams: list[HubspotStream]) -> list[HubspotStream]:
-        """Filter out dynamic streams whose token scopes are insufficient.
+    def _safe_streams(self, *stream_classes) -> list[HubspotStream]:
+        """Instantiate streams, skipping any that raise PermissionError (403).
 
-        For each stream that builds its schema via a live API call (all
-        DynamicHubspotStream subclasses), we trigger the schema access here so
-        that a 403 is caught gracefully instead of aborting discovery.
-        Streams whose properties endpoint returns 403 are skipped with a warning.
+        The Singer SDK accesses self.schema inside __init__, so dynamic streams
+        that call _get_available_properties() can raise PermissionError before
+        we ever get a chance to probe them post-instantiation.
         """
-        discovered = []
-        for stream in streams:
-            if isinstance(stream, DynamicHubspotStream):
-                try:
-                    _ = stream.schema  # triggers _get_available_properties()
-                    discovered.append(stream)
-                except PermissionError as e:
-                    user_logger.warning(
-                        f"Skipping stream '{stream.name}' — {e}"
-                    )
-            else:
-                discovered.append(stream)
-        return discovered
+        streams = []
+        for cls in stream_classes:
+            try:
+                streams.append(cls(self))
+            except PermissionError as e:
+                name = getattr(cls, "name", cls.__name__)
+                user_logger.warning(f"Skipping stream '{name}' — {e}")
+        return streams
 
     @cached_property
     def custom_objects(self) -> list[dict]:
