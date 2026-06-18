@@ -12,6 +12,7 @@ from nekt_singer_sdk.tap_base import Tap
 from tap_hubspot.client import DynamicHubspotStream, HubspotStream, uses_private_app_token
 from tap_hubspot.streams import (
     ArchivedDealStream,
+    ArchivedTaskStream,
     AuditLogsStream,
     CallStream,
     CommunicationStream,
@@ -233,6 +234,7 @@ class TapHubspot(Tap):
                 NoteStream(self),
                 PostalMailStream(self),
                 TaskStream(self),
+                ArchivedTaskStream(self),
                 FormsStream(self),
                 FormSubmissionsStream(self),
                 MarketingEmailStream(self),

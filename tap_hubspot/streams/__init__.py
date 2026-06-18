@@ -25,6 +25,7 @@ from .properties import PropertiesStream
 from .quotes import QuoteStream
 from .services import ServiceStream
 from .tasks import TaskStream
+from .tasks_archived import ArchivedTaskStream
 from .ticket_pipelines import TicketPipelineStream
 from .tickets import TicketStream
 from .users import UsersStream
