@@ -69,6 +69,29 @@ class OwnersStream(HubspotStream):
             th.BooleanType,
             description="Whether the record is archived.",
         ),
+        th.Property(
+            "teams",
+            th.ArrayType(
+                th.ObjectType(
+                    th.Property(
+                        "id",
+                        th.StringType,
+                        description="Unique identifier of the team.",
+                    ),
+                    th.Property(
+                        "name",
+                        th.StringType,
+                        description="Name of the team.",
+                    ),
+                    th.Property(
+                        "primary",
+                        th.BooleanType,
+                        description="Whether this is the owner's primary team.",
+                    ),
+                ),
+            ),
+            description="Teams the owner belongs to.",
+        ),
     ).to_dict()
 
     @property
