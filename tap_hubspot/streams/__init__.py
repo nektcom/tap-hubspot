@@ -13,6 +13,7 @@ from .feedback_submission import FeedbackSubmissionsStream
 from .form_submissions import FormSubmissionsStream
 from .forms import FormsStream
 from .goals import GoalStream
+from .lead_pipelines import LeadPipelineStream
 from .leads import LeadsStream
 from .line_item import LineItemStream
 from .marketing_emails import MarketingEmailStream

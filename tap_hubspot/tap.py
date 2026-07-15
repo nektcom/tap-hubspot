@@ -27,6 +27,7 @@ from tap_hubspot.streams import (
     FormsStream,
     FormSubmissionsStream,
     GoalStream,
+    LeadPipelineStream,
     LeadsStream,
     LineItemStream,
     MarketingEmailStream,
@@ -198,7 +199,7 @@ class TapHubspot(Tap):
             )
 
         if self.config.get("enable_leads_stream"):
-            streams_list.extend(self._safe_streams(LeadsStream))
+            streams_list.extend(self._safe_streams(LeadsStream, LeadPipelineStream))
 
         streams_list.extend(
             self._safe_streams(
