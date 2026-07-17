@@ -42,6 +42,7 @@ from tap_hubspot.streams import (
     TaskStream,
     TicketPipelineStream,
     TicketStream,
+    UsersPropertiesStream,
     UsersStream,
 )
 
@@ -206,6 +207,7 @@ class TapHubspot(Tap):
                 ServiceStream,
                 ContactStream,
                 UsersStream,
+                UsersPropertiesStream,
                 OwnersStream,
                 TicketPipelineStream,
                 DealPipelineStream,

@@ -30,3 +30,4 @@ from .tasks_archived import ArchivedTaskStream
 from .ticket_pipelines import TicketPipelineStream
 from .tickets import TicketStream
 from .users import UsersStream
+from .users_properties import UsersPropertiesStream
