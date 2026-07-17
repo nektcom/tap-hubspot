@@ -279,6 +279,21 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
     # (e.g. "deal" for extract_deal_property_history).
     _legacy_config_object_name: str | None = None
 
+    # HubSpot property types that the CRM Search API (incremental_path) rejects with a
+    # blanket 400 "There was a problem with the request" when included in the request
+    # body's "properties" array (e.g. hs_origin_object_coordinates, added by HubSpot to
+    # contacts/companies/calls/communications around 2026-07). These properties are still
+    # available on the regular GET/full-table path, so they're only excluded here.
+    _SEARCH_UNSUPPORTED_PROPERTY_TYPES = {"object_coordinates"}
+
+    @property
+    def _search_safe_properties(self) -> list[str]:
+        return [
+            name
+            for name, prop_type in self.hs_properties.items()
+            if prop_type not in self._SEARCH_UNSUPPORTED_PROPERTY_TYPES
+        ]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -555,7 +570,7 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
                         }
                     ],
                     "limit": page_size,  # Hubspot sets a limit of most 200 per request. Default is 10
-                    "properties": list(self.hs_properties),
+                    "properties": self._search_safe_properties,
                 }
             )
 
