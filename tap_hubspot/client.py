@@ -8,7 +8,7 @@ import sys
 import time
 from functools import cached_property
 from http import HTTPStatus
-from typing import Any, Callable
+from typing import Any, Callable, Iterable
 
 import pendulum
 import requests
@@ -294,6 +294,50 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
             if prop_type not in self._SEARCH_UNSUPPORTED_PROPERTY_TYPES
         ]
 
+    # HubSpot hard-caps /search request bodies at 3,000 characters. Leave a small
+    # margin (the "after" token and epoch timestamps vary a little in length
+    # across pages) without being so conservative that accounts comfortably under
+    # the real limit get switched onto the batch/read path unnecessarily.
+    _SEARCH_BODY_SAFE_LIMIT = 2900
+    _BATCH_READ_CHUNK_SIZE = 100
+
+    @cached_property
+    def _use_lean_search_properties(self) -> bool:
+        """Whether this stream's full /search body would risk HubSpot's 3,000-char cap.
+
+        Measures a representative body (same shape prepare_request_payload builds:
+        filters, sorts, pagination, and the full properties list) rather than just
+        the properties list length, so streams with comfortable headroom are left
+        on the existing single-call path unchanged.
+
+        When over the limit, /search only requests the replication key (enough to
+        find and page through matching records); full property values are
+        hydrated afterward via /batch/read, which has no such body-size limit.
+        """
+        sample_body = {
+            "after": "9999",
+            "filters": [
+                {"propertyName": self.replication_key, "operator": "GTE", "value": "9999999999999"},
+                {"propertyName": "hs_object_id", "operator": "GTE", "value": "99999999999"},
+            ],
+            "sorts": [{"propertyName": "hs_object_id", "direction": "ASCENDING"}],
+            "limit": 200,
+            "properties": self._search_safe_properties,
+        }
+        return len(json.dumps(sample_body)) > self._SEARCH_BODY_SAFE_LIMIT
+
+    @property
+    def _search_request_properties(self) -> list[str]:
+        """The "properties" value to send in the /search request body.
+
+        Lean (just the replication key) when the full list would risk HubSpot's
+        3,000-char /search body cap; the full safe property list otherwise, which
+        is the unchanged behavior for the vast majority of streams/accounts.
+        """
+        if self._use_lean_search_properties:
+            return [self.replication_key]
+        return self._search_safe_properties
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -570,11 +614,77 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
                         }
                     ],
                     "limit": page_size,  # Hubspot sets a limit of most 200 per request. Default is 10
-                    "properties": self._search_safe_properties,
+                    "properties": self._search_request_properties,
                 }
             )
 
         return body
+
+    def parse_response(self, response: requests.Response) -> Iterable[dict]:
+        records = list(super().parse_response(response))
+        if self._is_incremental_search(None) and self._use_lean_search_properties:
+            records = self._hydrate_properties_via_batch_read(records)
+        yield from records
+
+    def _hydrate_properties_via_batch_read(self, records: list[dict]) -> list[dict]:
+        """Fill in full property values for records fetched via a lean (ID-only) search.
+
+        Used when the account has too many properties to fit them all in the
+        /search request body. /batch/read has no such limit, so this fetches the
+        full properties in chunks of up to 100 records instead.
+        """
+        records_by_id = {record["id"]: record for record in records}
+        ids = list(records_by_id)
+
+        for start in range(0, len(ids), self._BATCH_READ_CHUNK_SIZE):
+            chunk = ids[start : start + self._BATCH_READ_CHUNK_SIZE]
+            for result in self._batch_read_properties(chunk):
+                record = records_by_id.get(result["id"])
+                if record:
+                    record["properties"] = result.get("properties", {})
+
+        return list(records_by_id.values())
+
+    def _batch_read_properties(self, ids: list[str]) -> list[dict]:
+        """Fetch full property values for up to 100 record IDs via /batch/read, with retries."""
+        batch_read_url = f"{self.url_base}/objects/{self.api_object_type}/batch/read"
+        payload = {"inputs": [{"id": record_id} for record_id in ids], "properties": self._search_safe_properties}
+
+        max_retries = 5
+        for attempt in range(max_retries):
+            headers = (
+                self.authenticator.auth_headers
+                if self.config.get("access_token")
+                else {"Authorization": f"Bearer {self.authenticator.access_token}"}  # this ensures a token refresh
+            )
+
+            try:
+                response = self._requests_session.post(batch_read_url, json=payload, headers=headers, timeout=30)
+                response.raise_for_status()
+                return response.json().get("results", [])
+
+            except requests.exceptions.HTTPError as e:
+                status_code = e.response.status_code
+                is_last_attempt = attempt >= max_retries - 1
+
+                if status_code == HTTPStatus.UNAUTHORIZED and not is_last_attempt:
+                    user_logger.warning("Token expired while batch-reading properties, refreshing token and retrying.")
+                    if hasattr(self.authenticator, "update_access_token"):
+                        self.authenticator.update_access_token()
+                    continue
+
+                if (status_code == HTTPStatus.TOO_MANY_REQUESTS or status_code >= 500) and not is_last_attempt:
+                    delay = self._retry_delay_seconds(e.response, attempt)
+                    user_logger.warning(
+                        f"HubSpot returned {status_code} batch-reading properties for {self.name}; "
+                        f"retrying in {delay:.1f}s (attempt {attempt + 1}/{max_retries})."
+                    )
+                    time.sleep(delay)
+                    continue
+
+                raise
+
+        return []
 
     @sleep_and_retry
     @limits(calls=100, period=10)  # 100 calls per 10 seconds (HubSpot API limit)
