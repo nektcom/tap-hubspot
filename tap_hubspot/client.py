@@ -14,7 +14,7 @@ import pendulum
 import requests
 from nekt_singer_sdk import typing as th
 from nekt_singer_sdk.authenticators import BearerTokenAuthenticator
-from nekt_singer_sdk.custom_logger import user_logger
+from nekt_singer_sdk.custom_logger import internal_logger, user_logger
 from nekt_singer_sdk.streams import RESTStream
 from nekt_singer_sdk.streams.core import REPLICATION_FULL_TABLE
 from ratelimit import limits, sleep_and_retry
@@ -139,6 +139,31 @@ class HubspotStream(RESTStream):
             params["after"] = next_page_token
         return params
 
+    # TEMPORARY diagnostic logging (NEKT-4141 follow-up): dump the full request and
+    # response whenever HubSpot returns an error, so org-specific 400s on /search can
+    # be diagnosed from production logs. Remove once the root cause is identified.
+    @property
+    def _debug_stream_label(self) -> str:
+        return getattr(self, "name", type(self).__name__)
+
+    def validate_response(self, response: requests.Response) -> None:
+        if response.status_code >= 400:
+            req = response.request
+            safe_headers = {
+                k: ("<redacted>" if k.lower() in ("authorization", "cookie") else v) for k, v in req.headers.items()
+            }
+            req_body = req.body
+            if isinstance(req_body, bytes):
+                req_body = req_body.decode("utf-8", errors="replace")
+            internal_logger.error(
+                f"[NEKT-4141-debug] [{self._debug_stream_label}] HTTP {response.status_code} on {req.method} {req.url}\n"
+                f"request headers: {safe_headers}\n"
+                f"request body ({len(req_body) if req_body else 0} chars): {str(req_body)[:8000]}\n"
+                f"response headers: {dict(response.headers)}\n"
+                f"response body: {response.text[:4000]}"
+            )
+        super().validate_response(response)
+
 
 class HubspotIncrementalStream(HubspotStream):
 
@@ -245,7 +270,19 @@ class DynamicHubspotStream(HubspotStream):
             )
         resp.raise_for_status()
         results = resp.json().get("results", [])
-        return {prop["name"]: prop["type"] for prop in results}
+        props = {prop["name"]: prop["type"] for prop in results}
+        # TEMPORARY diagnostic logging (NEKT-4141 follow-up): record the live property
+        # inventory per object so prod 400s can be correlated with unusual property
+        # names/types. Remove once the root cause is identified.
+        type_counts: dict[str, int] = {}
+        for prop_type in props.values():
+            type_counts[prop_type] = type_counts.get(prop_type, 0) + 1
+        internal_logger.info(
+            f"[NEKT-4141-debug] [{self.properties_path}] /crm/v3/properties returned {len(props)} properties; "
+            f"types: {type_counts}"
+        )
+        internal_logger.info(f"[NEKT-4141-debug] [{self.properties_path}] property map: {json.dumps(props)[:8000]}")
+        return props
 
     def get_url_params(
         self,
@@ -288,6 +325,19 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
 
     @property
     def _search_safe_properties(self) -> list[str]:
+        excluded = [
+            name
+            for name, prop_type in self.hs_properties.items()
+            if prop_type in self._SEARCH_UNSUPPORTED_PROPERTY_TYPES
+        ]
+        # TEMPORARY diagnostic logging (NEKT-4141 follow-up). Remove once the root
+        # cause is identified.
+        if excluded and not getattr(self, "_logged_search_exclusions", False):
+            self._logged_search_exclusions = True
+            internal_logger.info(
+                f"[NEKT-4141-debug] [{self._debug_stream_label}] excluding search-unsupported properties from /search payload: "
+                f"{excluded}"
+            )
         return [
             name
             for name, prop_type in self.hs_properties.items()
@@ -324,7 +374,15 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
             "limit": 200,
             "properties": self._search_safe_properties,
         }
-        return len(json.dumps(sample_body)) > self._SEARCH_BODY_SAFE_LIMIT
+        sample_body_length = len(json.dumps(sample_body))
+        use_lean = sample_body_length > self._SEARCH_BODY_SAFE_LIMIT
+        # TEMPORARY diagnostic logging (NEKT-4141 follow-up). Remove once the root
+        # cause is identified.
+        internal_logger.info(
+            f"[NEKT-4141-debug] [{self._debug_stream_label}] /search sample body length={sample_body_length} chars "
+            f"(safe limit {self._SEARCH_BODY_SAFE_LIMIT}) -> lean_mode={use_lean}"
+        )
+        return use_lean
 
     @property
     def _search_request_properties(self) -> list[str]:
@@ -618,6 +676,24 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
                 }
             )
 
+            # TEMPORARY diagnostic logging (NEKT-4141 follow-up): log exactly what is
+            # sent to /search, plus the replication settings in effect at runtime
+            # (the applied catalog can override replication_key/method, so log the
+            # live values rather than the class defaults). Remove once the root
+            # cause is identified.
+            body_json = json.dumps(body)
+            internal_logger.info(
+                f"[NEKT-4141-debug] [{self._debug_stream_label}] /search payload prepared: "
+                f"path={self.path!r}, replication_key={self.replication_key!r}, "
+                f"replication_method={self.replication_method!r}, "
+                f"date_filter={self.date_filter.isoformat() if self.date_filter else None}, "
+                f"epoch_ts={epoch_ts}, record_id_filter={self.record_id_filter}, "
+                f"after={body.get('after')}, lean_mode={self._use_lean_search_properties}, "
+                f"properties_sent={len(body.get('properties', []))}/{len(self.hs_properties)}, "
+                f"body_chars={len(body_json)}"
+            )
+            internal_logger.info(f"[NEKT-4141-debug] [{self._debug_stream_label}] /search full body: {body_json[:8000]}")
+
         return body
 
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
@@ -682,6 +758,13 @@ class DynamicIncrementalHubspotStream(DynamicHubspotStream):
                     time.sleep(delay)
                     continue
 
+                # TEMPORARY diagnostic logging (NEKT-4141 follow-up). Remove once the
+                # root cause is identified.
+                internal_logger.error(
+                    f"[NEKT-4141-debug] [{self._debug_stream_label}] /batch/read failed with HTTP {status_code} "
+                    f"({len(ids)} ids, {len(self._search_safe_properties)} properties requested); "
+                    f"response body: {e.response.text[:4000]}"
+                )
                 raise
 
         return []
