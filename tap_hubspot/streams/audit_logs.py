@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Generator
 
+import pendulum
 import requests
 from nekt_singer_sdk import typing as th
 from nekt_singer_sdk.custom_logger import user_logger
@@ -33,6 +34,10 @@ class AuditLogsStream(HubspotStream):
     primary_keys = ["id"]
     replication_key = "occurredAt"
     records_jsonpath = "$[results][*]"
+
+    # HubSpot rejects audit-log queries older than 365 days with a 400 error.
+    # Stay a bit inside that window to avoid boundary/clock-skew issues.
+    MAX_HISTORY_DAYS = 364
 
     schema = PropertiesList(
         Property(
@@ -89,9 +94,24 @@ class AuditLogsStream(HubspotStream):
 
     def get_url_params(self, context, next_page_token):
         params = super().get_url_params(context, next_page_token)
+        # HubSpot only allows querying the last 365 days of audit logs and returns a
+        # 400 for anything older. Clamp occurredAfter to the allowed window so an old
+        # start date / bookmark doesn't crash the tap; we still pull the maximum
+        # available history.
+        min_allowed = pendulum.now("UTC").subtract(days=self.MAX_HISTORY_DAYS)
         starting_value = self.get_starting_replication_key_value(context)
         if starting_value:
-            params["occurredAfter"] = starting_value
+            starting_dt = pendulum.parse(starting_value)
+            if starting_dt < min_allowed:
+                user_logger.warning(
+                    "[audit_logs] Requested start date is older than HubSpot's "
+                    f"365-day audit history limit; clamping occurredAfter to the last "
+                    f"{self.MAX_HISTORY_DAYS} days."
+                )
+                starting_dt = min_allowed
+        else:
+            starting_dt = min_allowed
+        params["occurredAfter"] = starting_dt.isoformat()
         return params
 
     def get_records(self, context: dict | None) -> Generator[dict, Any, None]:
@@ -103,6 +123,12 @@ class AuditLogsStream(HubspotStream):
                     "audit_logs stream is not available: missing 'account-info.security.read' scope. "
                     "This scope requires a HubSpot Enterprise account and re-authorization of the OAuth connection. "
                     "Skipping stream."
+                )
+                return
+            if "older than 365 days" in str(e):
+                user_logger.warning(
+                    "audit_logs stream requested data older than HubSpot's 365-day audit "
+                    "history limit. Skipping stream."
                 )
                 return
             raise
