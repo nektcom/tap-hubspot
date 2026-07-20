@@ -140,3 +140,18 @@ class AuditLogsStream(HubspotStream):
                 )
                 return
             raise
+
+    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
+        row = super().post_process(row, context) or row
+        # HubSpot returns actingUser.userId as an integer, but the schema declares it
+        # as a string; coerce it so the record matches the column type. HubSpot may
+        # also return actingUser as a bare user id instead of an object, so wrap it.
+        acting_user = row.get("actingUser")
+        if isinstance(acting_user, dict):
+            for key in ("userId", "userEmail"):
+                value = acting_user.get(key)
+                if value is not None:
+                    acting_user[key] = str(value)
+        elif acting_user is not None:
+            row["actingUser"] = {"userId": str(acting_user), "userEmail": None}
+        return row
