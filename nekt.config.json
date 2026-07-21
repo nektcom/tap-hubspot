@@ -294,7 +294,7 @@
           "max_size": {
             "type": "integer",
             "hidden": true,
-            "default": 1000,
+            "default": 20000,
             "el_type": "loader"
           }
         }
