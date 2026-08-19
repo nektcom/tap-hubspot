@@ -216,7 +216,7 @@ class TapHubspot(Tap):
                 CompanyStream,
                 DealStream,
                 ArchivedDealStream,
-                # FeedbackSubmissionsStream,
+                FeedbackSubmissionsStream,
                 LineItemStream,
                 ProductStream,
                 TicketStream,
