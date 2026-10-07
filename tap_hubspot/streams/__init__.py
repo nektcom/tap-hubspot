@@ -17,6 +17,7 @@ from .lead_pipelines import LeadPipelineStream
 from .leads import LeadsStream
 from .line_item import LineItemStream
 from .marketing_emails import MarketingEmailStream
+from .marketing_events import MarketingEventParticipationStream, MarketingEventStream
 from .meetings import MeetingStream
 from .notes import NoteStream
 from .owners import OwnersStream

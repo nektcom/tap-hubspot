@@ -31,6 +31,8 @@ from tap_hubspot.streams import (
     LeadsStream,
     LineItemStream,
     MarketingEmailStream,
+    MarketingEventParticipationStream,
+    MarketingEventStream,
     MeetingStream,
     NoteStream,
     OwnersStream,
@@ -233,6 +235,8 @@ class TapHubspot(Tap):
                 FormsStream,
                 FormSubmissionsStream,
                 MarketingEmailStream,
+                MarketingEventStream,
+                MarketingEventParticipationStream,
                 AuditLogsStream,
             )
         )

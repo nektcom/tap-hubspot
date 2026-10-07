@@ -72,8 +72,21 @@ The following scopes need to be added to your access token to access the followi
 - Quotes: `crm.objects.quotes.read` or `crm.schemas.quotes.read`
 - Goals: `crm.objects.goals.read`
 - Emails: `sales-email-read`
+- Marketing Events and Marketing Event Participations: `crm.objects.marketing_events.read`
 
 For more info on the streams and permissions, check the [Hubspot API Documentation](https://developers.hubspot.com/docs/api/overview).
+
+## API quirks
+
+- **Marketing events (`marketing_events`, `marketing_event_participations`)**: both use the Marketing
+  Events API (`/marketing/v3/marketing-events`) and need `crm.objects.marketing_events.read`. A
+  connection authorized before that scope existed gets `403`; the streams skip with a warning
+  instead of failing the run (`401` stays fatal). The list endpoint
+  has no updated-since filter, and the participations breakdown keeps only each contact's
+  **current** state per event (a register → cancel → re-register shows as one `REGISTERED` row), so
+  both streams are full table. The breakdown's `properties.occurredAt` is typed as epoch
+  milliseconds in HubSpot's OpenAPI but shown as an ISO string in its guide; the tap normalizes both
+  to ISO 8601.
 
 ## Usage
 
